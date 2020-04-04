@@ -1,6 +1,13 @@
 from flask import Flask, jsonify, send_from_directory
 
+import commands
+from statusMonitor import StatusMonitor
+
+__author__ = "Mike Green"
+
 STATIC_ROOT = "static"
+
+status_monitor = StatusMonitor()
 
 
 def create_app():
@@ -15,17 +22,19 @@ def create_app():
         """Serve static content relative from STATIC_ROOT directory."""
         return send_from_directory(STATIC_ROOT, path)
 
+    @app.route("/status")
+    def status():
+        return jsonify({"status": status_monitor.status.name})
+
     @app.route("/actions/activate")
     def activate():
-        return jsonify({"test": "activated"})
+        status_monitor.set_active(True)
+        return commands.activate()
 
     @app.route("/actions/deactivate")
     def deactivate():
-        return jsonify({"test": "deactivated"})
-
-    @app.route("/status")
-    def status():
-        return jsonify({"status": "Some status"})
+        status_monitor.set_active(False)
+        return commands.deactivate()
 
     return app
 

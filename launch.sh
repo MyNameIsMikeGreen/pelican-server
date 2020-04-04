@@ -7,6 +7,6 @@ if [[ ! -d "$VENV_DIR" ]]; then
 fi
 source ${VENV_DIR}/bin/activate
 pip3 install -r requirements.txt
-python3 src/pelican_server.py
+python3 src/pelicanserver.py
 deactivate
 echo "Pelican Server terminated."

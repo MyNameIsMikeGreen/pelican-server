@@ -18,3 +18,5 @@ From the root of the project, launch with:
 ```bash
 ./launch.sh
 ```
+
+The server will be available at `localhost:8000`.
