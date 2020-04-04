@@ -1,4 +1,6 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
+
+STATIC_ROOT = "static"
 
 
 def create_app():
@@ -6,14 +8,12 @@ def create_app():
 
     @app.route("/")
     def root():
-        return """
-        <h1>Welcome to the Pelican Server</h1>
-        <p>
-            Activation endpoint available at: <b>/actions/activate</b><br />
-            Deactivate endpoint available at: <b>/actions/deactivate</b><br />
-            Status endpoint available at: <b>/status</b><br />
-        </p>
-        """
+        return static_content("index.html")
+
+    @app.route('/<path:path>')
+    def static_content(path):
+        """Serve static content relative from STATIC_ROOT directory."""
+        return send_from_directory(STATIC_ROOT, path)
 
     @app.route("/actions/activate")
     def activate():
