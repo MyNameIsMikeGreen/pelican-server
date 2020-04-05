@@ -3,7 +3,8 @@ import subprocess
 
 
 def activate():
-    partitions = json.load("config/partitions.json")
+    with open("config/partitions.json") as partitions_file:
+        partitions = json.load(partitions_file)
     for mapping in partitions:
         _mount(mapping["partition"], mapping["mountPoint"])
     _start_minidlna()
