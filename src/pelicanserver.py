@@ -29,12 +29,14 @@ def create_app():
     @app.route("/actions/activate")
     def activate():
         status_monitor.set_active(True)
-        return commands.activate()
+        commands.activate()
+        return jsonify({"result": "activated"})
 
     @app.route("/actions/deactivate")
     def deactivate():
         status_monitor.set_active(False)
-        return commands.deactivate()
+        commands.deactivate()
+        return jsonify({"result": "deactivated"})
 
     return app
 

@@ -1,0 +1,6 @@
+[
+  {
+    "partition": "/dev/sda2",
+    "mountPoint": "/media/pi/WD_5TB_Media"
+  }
+]
