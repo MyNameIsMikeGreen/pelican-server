@@ -11,16 +11,20 @@ def activate():
 
 def deactivate():
     _stop_minidlna()
-    _unmount(f"/dev/sda")
+    _unmount("/dev/sda")
 
 
 def _mount(device, mount_point):
-    subprocess.check_call(f"sudo mount {device} {mount_point}")
+    subprocess.check_call("sudo mount {device} {mount_point}".format(device=device, mount_point=mount_point))
 
 
 def _unmount(device, retries_count=5):
     for i in range(0, retries_count):
-        subprocess.check_call(f"sudo eject {device}")
+        try:
+            subprocess.check_call("sudo eject {device}".format(device=device))
+        except subprocess.CalledProcessError:
+            continue
+        break
 
 
 def _start_minidlna():
