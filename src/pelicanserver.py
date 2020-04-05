@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, send_from_directory
 
 import commands
-from statusMonitor import StatusMonitor
+from statusMonitor import StatusMonitor, Status
 
 __author__ = "Mike Green"
 
@@ -25,16 +25,23 @@ def create_app():
 
     @app.route("/status")
     def status():
-        return jsonify({"status": status_monitor.status.name})
+        return jsonify({
+            "status": status_monitor.status.name,
+            "lastChange": str(status_monitor.last_change)
+        })
 
     @app.route("/actions/activate")
     def activate():
+        if status_monitor.status == Status.ACTIVE:
+            return jsonify({"result": "already activated; no change"})
         status_monitor.set_active(True)
         command_executor.activate()
         return jsonify({"result": "activated"})
 
     @app.route("/actions/deactivate")
     def deactivate():
+        if status_monitor.status == Status.DEACTIVE:
+            return jsonify({"result": "already deactivated; no change"})
         status_monitor.set_active(False)
         command_executor.deactivate()
         return jsonify({"result": "deactivated"})
