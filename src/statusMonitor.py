@@ -2,8 +2,8 @@ import enum
 
 
 class Status(enum.Enum):
-    ACTIVE = enum.auto()
-    DEACTIVE = enum.auto()
+    ACTIVE = 1
+    DEACTIVE = 0
 
 
 class StatusMonitor:

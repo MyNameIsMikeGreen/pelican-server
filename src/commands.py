@@ -11,7 +11,7 @@ def activate():
 
 def deactivate():
     _stop_minidlna()
-    _unmount("/dev/sda")
+    _unmount("/dev/sda")    # TODO: Remove hardcoded device
 
 
 def _mount(device, mount_point):
