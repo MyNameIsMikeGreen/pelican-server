@@ -8,6 +8,7 @@ __author__ = "Mike Green"
 STATIC_ROOT = "static"
 
 status_monitor = StatusMonitor()
+command_executor = commands.CommandExecutor()
 
 
 def create_app():
@@ -29,13 +30,13 @@ def create_app():
     @app.route("/actions/activate")
     def activate():
         status_monitor.set_active(True)
-        commands.activate()
+        command_executor.activate()
         return jsonify({"result": "activated"})
 
     @app.route("/actions/deactivate")
     def deactivate():
         status_monitor.set_active(False)
-        commands.deactivate()
+        command_executor.deactivate()
         return jsonify({"result": "deactivated"})
 
     return app

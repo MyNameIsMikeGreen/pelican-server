@@ -14,12 +14,17 @@ Project dependencies will be automatically downloaded when using the launch scri
 
 ## Launch
 
-Define the partitions that are required by miniDLNA in `config/partitions.json`. It should look similar to this:
+Define the partitions that are required by miniDLNA in `config/devices.json`. It should look similar to this:
 ```json
 [
   {
-    "partition": "/dev/sda2",
-    "mountPoint": "/media/myPartition"
+    "path": "/dev/sda",
+    "partitions": [
+      {
+        "path": "/dev/sda2",
+        "mountPoint": "/media/pi/WD_5TB_Media"
+      }
+    ]
   }
 ]
 ```

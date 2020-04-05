@@ -8,7 +8,8 @@ class Status(enum.Enum):
 
 class StatusMonitor:
 
-    status = Status.ACTIVE
+    def __init__(self):
+        self.status = Status.DEACTIVE
 
     def set_active(self, active):
         if active:
