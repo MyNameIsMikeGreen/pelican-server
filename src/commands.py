@@ -33,6 +33,6 @@ def _start_minidlna():
 
 
 def _stop_minidlna():
-    subprocess.check_call("sudo service minidlna stop")
+    subprocess.check_call("sudo service minidlna stop", shell=True)
 
 # TODO: Remove shell=True
