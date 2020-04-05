@@ -16,22 +16,24 @@ def deactivate():
 
 
 def _mount(device, mount_point):
-    subprocess.check_call("sudo mount {device} {mount_point}".format(device=device, mount_point=mount_point))
+    subprocess.check_call("sudo mount {device} {mount_point}".format(device=device, mount_point=mount_point), shell=True)
 
 
 def _unmount(device, retries_count=5):
     for i in range(0, retries_count):
         try:
-            subprocess.check_call("sudo eject {device}".format(device=device))
+            subprocess.check_call("sudo eject {device}".format(device=device), shell=True)
         except subprocess.CalledProcessError:
             continue
         break
 
 
 def _start_minidlna():
-    subprocess.check_call("sudo service minidlna restart")
-    subprocess.check_call("minidlnad -R")
+    subprocess.check_call("sudo service minidlna restart", shell=True)
+    subprocess.check_call("minidlnad -R", shell=True)
 
 
 def _stop_minidlna():
     subprocess.check_call("sudo service minidlna stop")
+
+# TODO: Remove shell=True
