@@ -30,7 +30,6 @@ def _unmount(device, retries_count=5):
 
 def _start_minidlna():
     subprocess.check_call("sudo service minidlna restart", shell=True)
-    subprocess.check_call("minidlnad -R", shell=True)
 
 
 def _stop_minidlna():
