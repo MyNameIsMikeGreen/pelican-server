@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, send_from_directory
 
-import commands
+from automaticdeactivator import AutomaticDeactivator
+from commands import CommandExecutor
 from statusMonitor import StatusMonitor, Status
 
 __author__ = "Mike Green"
@@ -8,7 +9,8 @@ __author__ = "Mike Green"
 STATIC_ROOT = "static"
 
 status_monitor = StatusMonitor()
-command_executor = commands.CommandExecutor()
+command_executor = CommandExecutor()
+automatic_deactivator = AutomaticDeactivator(status_monitor, command_executor)
 
 
 def create_app():
@@ -34,16 +36,17 @@ def create_app():
     def activate():
         if status_monitor.status == Status.ACTIVATED:
             return jsonify({"result": "already activated; no change"})
-        status_monitor.set_active(True)
         command_executor.activate()
+        status_monitor.set_active(True)
+        automatic_deactivator.reset_timer()
         return jsonify({"result": "activated"})
 
     @app.route("/actions/deactivate")
     def deactivate():
         if status_monitor.status == Status.DEACTIVATED:
             return jsonify({"result": "already deactivated; no change"})
-        status_monitor.set_active(False)
         command_executor.deactivate()
+        status_monitor.set_active(False)
         return jsonify({"result": "deactivated"})
 
     return app
