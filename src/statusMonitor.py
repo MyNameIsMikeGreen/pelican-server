@@ -3,21 +3,21 @@ from datetime import datetime
 
 
 class Status(enum.Enum):
-    ACTIVE = 1
-    DEACTIVE = 0
+    ACTIVATED = 1
+    DEACTIVATED = 0
 
 
 class StatusMonitor:
 
     def __init__(self):
-        self.status = Status.DEACTIVE
+        self.status = Status.DEACTIVATED
         self._set_timestamp()
 
     def set_active(self, active):
         if active:
-            self.status = Status.ACTIVE
+            self.status = Status.ACTIVATED
         else:
-            self.status = Status.DEACTIVE
+            self.status = Status.DEACTIVATED
         self._set_timestamp()
 
     def _set_timestamp(self):

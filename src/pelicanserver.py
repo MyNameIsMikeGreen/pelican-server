@@ -32,7 +32,7 @@ def create_app():
 
     @app.route("/actions/activate")
     def activate():
-        if status_monitor.status == Status.ACTIVE:
+        if status_monitor.status == Status.ACTIVATED:
             return jsonify({"result": "already activated; no change"})
         status_monitor.set_active(True)
         command_executor.activate()
@@ -40,7 +40,7 @@ def create_app():
 
     @app.route("/actions/deactivate")
     def deactivate():
-        if status_monitor.status == Status.DEACTIVE:
+        if status_monitor.status == Status.DEACTIVATED:
             return jsonify({"result": "already deactivated; no change"})
         status_monitor.set_active(False)
         command_executor.deactivate()
