@@ -8,54 +8,61 @@ __author__ = "Mike Green"
 
 STATIC_ROOT = "static"
 
-status_monitor = StatusMonitor()
-command_executor = CommandExecutor()
-automatic_deactivator = AutomaticDeactivator(status_monitor, command_executor)
 
+class PelicanServer:
 
-def create_app():
-    app = Flask(__name__)
+    def __init__(self, automatic_deactivator, status_monitor=StatusMonitor(), command_executor=CommandExecutor()):
+        self.status_monitor = status_monitor
+        self.command_executor = command_executor
+        # self.command_executor.deactivate()
+        if automatic_deactivator:
+            self.automatic_deactivator = automatic_deactivator
+        else:
+            self.automatic_deactivator = AutomaticDeactivator(self.command_executor, self.status_monitor)
+        self.app = self._create_app()
 
-    @app.route("/")
-    def root():
-        return static_content("index.html")
+    def _create_app(self):
+        app = Flask(__name__)
 
-    @app.route('/<path:path>')
-    def static_content(path):
-        """Serve static content relative from STATIC_ROOT directory."""
-        return send_from_directory(STATIC_ROOT, path)
+        @app.route("/")
+        def root():
+            return static_content("index.html")
 
-    @app.route("/status")
-    def status():
-        return jsonify({
-            "status": status_monitor.status.name,
-            "lastChange": str(status_monitor.last_change)
-        })
+        @app.route('/<path:path>')
+        def static_content(path):
+            """Serve static content relative from STATIC_ROOT directory."""
+            return send_from_directory(STATIC_ROOT, path)
 
-    @app.route("/actions/activate")
-    def activate():
-        if status_monitor.status == Status.ACTIVATED:
-            return jsonify({"result": "already activated; no change"})
-        command_executor.activate()
-        status_monitor.set_active(True)
-        automatic_deactivator.reset_timer()
-        return jsonify({"result": "activated"})
+        @app.route("/status")
+        def status():
+            return jsonify({
+                "status": self.status_monitor.status.name,
+                "lastChange": str(self.status_monitor.last_change)
+            })
 
-    @app.route("/actions/deactivate")
-    def deactivate():
-        if status_monitor.status == Status.DEACTIVATED:
-            return jsonify({"result": "already deactivated; no change"})
-        command_executor.deactivate()
-        status_monitor.set_active(False)
-        return jsonify({"result": "deactivated"})
+        @app.route("/actions/activate")
+        def activate():
+            if self.status_monitor.status == Status.ACTIVATED:
+                return jsonify({"result": "already activated; no change"})
+            self.command_executor.activate()
+            self.status_monitor.set_active(True)
+            self.automatic_deactivator.reset_timer()
+            return jsonify({"result": "activated"})
 
-    return app
+        @app.route("/actions/deactivate")
+        def deactivate():
+            if self.status_monitor.status == Status.DEACTIVATED:
+                return jsonify({"result": "already deactivated; no change"})
+            self.command_executor.deactivate()
+            self.status_monitor.set_active(False)
+            return jsonify({"result": "deactivated"})
+
+        return app
 
 
 def main():
-    command_executor.deactivate()
-    app = create_app()
-    app.run(host="0.0.0.0", port=8000)
+    pelican_server = PelicanServer(None)
+    pelican_server.app.run(host="0.0.0.0", port=8000)
 
 
 if __name__ == "__main__":

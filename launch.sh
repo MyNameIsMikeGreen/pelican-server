@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
-echo "Launching Pelican Server..."
+
+
+echo "Performing environment setup..."
 ORIGINAL_DIRECTORY="`pwd`"
 LOCAL_DIRECTORY="`dirname ${0}`"
 cd ${LOCAL_DIRECTORY}
@@ -10,7 +12,19 @@ if [[ ! -d "$VENV_DIR" ]]; then
 fi
 source ${VENV_DIR}/bin/activate
 pip3 install -r requirements.txt
+
+
+echo "Running tests..."
+cd src
+python3 -m pytest
+cd ..
+
+
+echo "Launching Pelican Server..."
 python3 src/pelicanserver.py
+
+
+echo "Performing environment teardown..."
 deactivate
 cd ${ORIGINAL_DIRECTORY}
 echo "Pelican Server terminated."
