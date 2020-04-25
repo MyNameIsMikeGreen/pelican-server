@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import Mock
 
 import pelicanserver
 
@@ -6,7 +7,7 @@ import pelicanserver
 class PelicanServerTests(unittest.TestCase):
 
     def setUp(self):
-        self.pelican_server = pelicanserver.PelicanServer(None)
+        self.pelican_server = pelicanserver.PelicanServer(None, command_executor=Mock())
         self.pelican_server.app.config['TESTING'] = True
         self.app = self.pelican_server.app.test_client()
 

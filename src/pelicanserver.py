@@ -14,7 +14,7 @@ class PelicanServer:
     def __init__(self, automatic_deactivator, status_monitor=StatusMonitor(), command_executor=CommandExecutor()):
         self.status_monitor = status_monitor
         self.command_executor = command_executor
-        # self.command_executor.deactivate()
+        self.command_executor.deactivate()
         if automatic_deactivator:
             self.automatic_deactivator = automatic_deactivator
         else:
