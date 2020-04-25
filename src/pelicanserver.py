@@ -11,7 +11,7 @@ STATIC_ROOT = "static"
 
 class PelicanServer:
 
-    def __init__(self, automatic_deactivator, status_monitor=StatusMonitor(), command_executor=CommandExecutor()):
+    def __init__(self, status_monitor, command_executor, automatic_deactivator=None):
         self.status_monitor = status_monitor
         self.command_executor = command_executor
         self.command_executor.deactivate()
@@ -61,7 +61,9 @@ class PelicanServer:
 
 
 def main():
-    pelican_server = PelicanServer(None)
+    status_monitor = StatusMonitor()
+    command_executor = CommandExecutor()
+    pelican_server = PelicanServer(status_monitor, command_executor)
     pelican_server.app.run(host="0.0.0.0", port=8000)
 
 
