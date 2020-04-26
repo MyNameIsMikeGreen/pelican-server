@@ -36,6 +36,7 @@ class TestPelicanServer(unittest.TestCase):
         response_json = json.loads(response.get_data(as_text=True))
         self.assertTrue("status" in response_json, "Response contains key: status")
         self.assertTrue("lastChange" in response_json, "Response contains key: lastChange")
+        self.assertTrue("lastChangeBy" in response_json, "Response contains key: lastChangeBy")
 
     def test_server_returns_activation_response_when_activation_occurs(self):
         status_monitor = Mock()

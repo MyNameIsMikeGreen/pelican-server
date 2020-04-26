@@ -37,7 +37,8 @@ class PelicanServer:
         def status():
             return jsonify({
                 "status": self.status_monitor.status.name,
-                "lastChange": str(self.status_monitor.last_change)
+                "lastChange": str(self.status_monitor.last_change),
+                "lastChangeBy": self.status_monitor.last_change_by
             })
 
         @app.route("/actions/activate")
