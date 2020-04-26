@@ -6,7 +6,7 @@ import pelicanserver
 from statusMonitor import StatusMonitor, Status
 
 
-class PelicanServerTests(unittest.TestCase):
+class TestPelicanServer(unittest.TestCase):
 
     def setup_server(self, status_monitor=StatusMonitor(), command_executor=StatusMonitor):
         self.pelican_server = pelicanserver.PelicanServer(status_monitor, command_executor)
