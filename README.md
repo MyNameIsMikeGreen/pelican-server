@@ -36,3 +36,8 @@ From the root of the project, launch with:
 ```
 
 The server will be available at `localhost:8000`.
+
+## Test
+```bash
+py.test
+```
