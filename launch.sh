@@ -15,7 +15,12 @@ pip3 install -r requirements.txt
 
 
 echo "Running tests..."
-pytest
+if pytest ; then
+    echo "Tests completed successfully."
+else
+    echo "Tests failed. Launch aborted."
+    exit 1
+fi
 
 
 echo "Launching Pelican Server..."

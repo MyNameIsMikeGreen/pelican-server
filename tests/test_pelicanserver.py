@@ -4,16 +4,21 @@ import sys
 import unittest
 from unittest.mock import Mock
 
+from automaticdeactivator import AutomaticDeactivator
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/')))
 
 import pelicanserver
 from statusMonitor import StatusMonitor, Status
 
+AUTOMATIC_DEACTIVATOR_TIMEOUT_SECONDS = 3
+
 
 class TestPelicanServer(unittest.TestCase):
 
     def setup_server(self, status_monitor=StatusMonitor(), command_executor=StatusMonitor):
-        self.pelican_server = pelicanserver.PelicanServer(status_monitor, command_executor)
+        automatic_deactivator = AutomaticDeactivator(command_executor, status_monitor, AUTOMATIC_DEACTIVATOR_TIMEOUT_SECONDS)
+        self.pelican_server = pelicanserver.PelicanServer(status_monitor, command_executor, automatic_deactivator)
         self.pelican_server.app.config['TESTING'] = True
         self.app_client = self.pelican_server.app.test_client()
 
