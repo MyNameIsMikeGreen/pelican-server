@@ -30,16 +30,16 @@ class CommandExecutor:
             self._unmount(device["path"])
 
     def _mount(self, device, mount_point):
-        self.logger.info(f"Mounting '{device}' at '{mount_point}'.")
+        self.logger.info("Mounting '" + device + "' at '" + mount_point + "'.")
         subprocess.check_call(self.mount_command_template.format(device=device, mount_point=mount_point), shell=True)
 
     def _unmount(self, device, retries_count=5):
         for i in range(0, retries_count):
             try:
-                self.logger.info(f"Unmounting '{device}'.")
+                self.logger.info("Unmounting '" + device + "'.")
                 subprocess.check_call(self.unmount_command_template.format(device=device), shell=True)
             except subprocess.CalledProcessError:
-                self.logger.info(f"Unmounting '{device}' failed.")
+                self.logger.info("Unmounting '" + device + "' failed.")
                 continue
             break
 

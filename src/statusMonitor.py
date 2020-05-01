@@ -24,7 +24,7 @@ class StatusMonitor:
             self.status = Status.DEACTIVATED
         self._set_timestamp()
         self.last_change_by = changed_by
-        self.logger.info(f"New status: {str(self.status.name)}.")
+        self.logger.info("New status: " + str(self.status.name) + ".")
 
     def _set_timestamp(self):
         self.last_change = datetime.now()
