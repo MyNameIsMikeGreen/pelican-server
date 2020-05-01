@@ -26,7 +26,7 @@ class TestPelicanServer(unittest.TestCase):
         self.setup_server(command_executor=Mock())
         response = self.app_client.get('/', follow_redirects=True)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
-        with open("testresources/index.html") as index_page:
+        with open(os.path.dirname(__file__) + "/testresources/index.html") as index_page:
             expected_content = index_page.read()
             self.assertEqual(expected_content, response.data.decode("utf-8"), "Static index.html file returned")
 
@@ -34,7 +34,7 @@ class TestPelicanServer(unittest.TestCase):
         self.setup_server(command_executor=Mock())
         response = self.app_client.get('/index.html', follow_redirects=True)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
-        with open("testresources/index.html") as index_page:
+        with open(os.path.dirname(__file__) + "/testresources/index.html") as index_page:
             expected_content = index_page.read()
             self.assertEqual(expected_content, response.data.decode("utf-8"), "Static index.html file returned")
 

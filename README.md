@@ -36,3 +36,11 @@ From the root of the project, launch with:
 ```
 
 The server will be available at `localhost:8000`.
+
+## Test
+Testing is integrated into the launch script. If the tests fail, the server will not be launched. However, it is possible to manually run the tests from the project root directory using:
+```bash
+pytest
+```
+
+Most other Python testing runners are also compatible with this project in-place of `pytest`.
