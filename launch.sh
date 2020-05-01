@@ -15,7 +15,7 @@ pip3 install -r requirements.txt
 
 
 echo "Running tests..."
-nosetests
+pytest
 
 
 echo "Launching Pelican Server..."
