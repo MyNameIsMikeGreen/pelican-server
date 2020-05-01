@@ -42,7 +42,7 @@ class TestCommandExecutor(unittest.TestCase):
             ("root", "INFO", "Starting minidlna.")
         )
 
-    def test_each_device_mounted(self):
+    def test_each_device_unmounted(self):
         self.command_executor.deactivate()
         self.log_capture.check(
             ("root", "INFO", "Stopping minidlna."),
