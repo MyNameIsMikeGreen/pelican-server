@@ -1,12 +1,15 @@
+import os
+import sys
 import time
 import unittest
 from unittest.mock import Mock
+
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/')))
 
 from automaticdeactivator import AutomaticDeactivator
 
 
 class TestStatusMonitor(unittest.TestCase):
-
     TEST_TIMEOUT = 1
 
     def setUp(self):
@@ -17,17 +20,17 @@ class TestStatusMonitor(unittest.TestCase):
                                                           timeout_seconds=self.TEST_TIMEOUT)
 
     def test_deactivate_called_after_timeout(self):
-        time.sleep(self.TEST_TIMEOUT+1)
+        time.sleep(self.TEST_TIMEOUT + 1)
         self.command_executor.deactivate.assert_called()
         self.status_monitor.set_active.assert_called_with(False, changed_by="automatic_deactivator")
 
     def test_timer_resets_correctly(self):
-        time.sleep(self.TEST_TIMEOUT / 2)   # Before original timeout
+        time.sleep(self.TEST_TIMEOUT / 2)  # Before original timeout
         self.automatic_deactivator.reset_timer()
-        time.sleep((self.TEST_TIMEOUT / 2) + 0.1)   # Shortly after time of original timeout
+        time.sleep((self.TEST_TIMEOUT / 2) + 0.1)  # Shortly after time of original timeout
         self.command_executor.deactivate.assert_not_called()
         self.status_monitor.set_active.assert_not_called()
-        time.sleep(self.TEST_TIMEOUT)   # After waiting for a new timeout period
+        time.sleep(self.TEST_TIMEOUT)  # After waiting for a new timeout period
         self.command_executor.deactivate.assert_called()
         self.status_monitor.set_active.assert_called_with(False, changed_by="automatic_deactivator")
 
