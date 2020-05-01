@@ -4,6 +4,11 @@ import subprocess
 
 class CommandExecutor:
 
+    minidlna_restart_command = "sudo service minidlna restart"
+    minidlna_stop_command = "sudo service minidlna stop"
+    mount_command_template = "sudo mount {device} {mount_point}"
+    unmount_command_template = "sudo eject {device}"
+
     devices = []
 
     def __init__(self, devices_file_path="config/devices.json"):
@@ -21,23 +26,19 @@ class CommandExecutor:
         for device in self.devices:
             self._unmount(device["path"])
 
-    @staticmethod
-    def _mount(device, mount_point):
-        subprocess.check_call("sudo mount {device} {mount_point}".format(device=device, mount_point=mount_point), shell=True)
+    def _mount(self, device, mount_point):
+        subprocess.check_call(self.mount_command_template.format(device=device, mount_point=mount_point), shell=True)
 
-    @staticmethod
-    def _unmount(device, retries_count=5):
+    def _unmount(self, device, retries_count=5):
         for i in range(0, retries_count):
             try:
-                subprocess.check_call("sudo eject {device}".format(device=device), shell=True)
+                subprocess.check_call(self.unmount_command_template.format(device=device), shell=True)
             except subprocess.CalledProcessError:
                 continue
             break
 
-    @staticmethod
-    def _start_minidlna():
-        subprocess.check_call("sudo service minidlna restart", shell=True)
+    def _start_minidlna(self):
+        subprocess.check_call(self.minidlna_restart_command, shell=True)
 
-    @staticmethod
-    def _stop_minidlna():
-        subprocess.check_call("sudo service minidlna stop", shell=True)
+    def _stop_minidlna(self):
+        subprocess.check_call(self.minidlna_stop_command, shell=True)

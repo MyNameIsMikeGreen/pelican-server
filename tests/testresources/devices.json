@@ -1,0 +1,11 @@
+[
+  {
+    "path": "/dev/sda",
+    "partitions": [
+      {
+        "path": "/dev/sda1",
+        "mountPoint": "/media/my_mount_point"
+      }
+    ]
+  }
+]
