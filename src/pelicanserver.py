@@ -1,3 +1,6 @@
+import logging
+from subprocess import CalledProcessError
+
 from flask import Flask, jsonify, send_from_directory
 
 from automaticdeactivator import AutomaticDeactivator
@@ -14,7 +17,12 @@ class PelicanServer:
     def __init__(self, status_monitor, command_executor, automatic_deactivator=None):
         self.status_monitor = status_monitor
         self.command_executor = command_executor
-        self.command_executor.deactivate()
+        try:
+            self.command_executor.deactivate()
+        except CalledProcessError:
+            logging.fatal("Failed to deactivate upon startup of Pelican Server. "
+                          "MiniDLNA may not be installed. Aborting...")
+            exit(1)
         if automatic_deactivator:
             self.automatic_deactivator = automatic_deactivator
         else:
@@ -62,6 +70,7 @@ class PelicanServer:
 
 
 def main():
+    logging.basicConfig(filename='pelicanServerLog.log', level=logging.INFO)
     status_monitor = StatusMonitor()
     command_executor = CommandExecutor()
     pelican_server = PelicanServer(status_monitor, command_executor)
