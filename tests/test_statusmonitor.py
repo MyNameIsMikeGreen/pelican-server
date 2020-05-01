@@ -26,3 +26,7 @@ class TestStatusMonitor(unittest.TestCase):
         self.assertEqual(Status.DEACTIVATED, self.status_monitor.status)
         self.assertGreater(self.status_monitor.last_change, original_timestamp)
         self.assertEqual(self.status_monitor.last_change_by, changed_by_string)
+
+
+if __name__ == "__main__":
+    unittest.main()

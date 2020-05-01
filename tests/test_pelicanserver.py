@@ -1,4 +1,5 @@
 import json
+import os
 import unittest
 from unittest.mock import Mock
 
@@ -11,11 +12,11 @@ class TestPelicanServer(unittest.TestCase):
     def setup_server(self, status_monitor=StatusMonitor(), command_executor=StatusMonitor):
         self.pelican_server = pelicanserver.PelicanServer(status_monitor, command_executor)
         self.pelican_server.app.config['TESTING'] = True
-        self.app = self.pelican_server.app.test_client()
+        self.app_client = self.pelican_server.app.test_client()
 
     def test_server_returns_static_homepage(self):
         self.setup_server(command_executor=Mock())
-        response = self.app.get('/', follow_redirects=True)
+        response = self.app_client.get('/', follow_redirects=True)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         with open("testresources/index.html") as index_page:
             expected_content = index_page.read()
@@ -23,7 +24,7 @@ class TestPelicanServer(unittest.TestCase):
 
     def test_server_returns_index_page(self):
         self.setup_server(command_executor=Mock())
-        response = self.app.get('/index.html', follow_redirects=True)
+        response = self.app_client.get('/index.html', follow_redirects=True)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         with open("testresources/index.html") as index_page:
             expected_content = index_page.read()
@@ -31,7 +32,7 @@ class TestPelicanServer(unittest.TestCase):
 
     def test_server_returns_status(self):
         self.setup_server(command_executor=Mock())
-        response = self.app.get('/status', follow_redirects=True)
+        response = self.app_client.get('/status', follow_redirects=True)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         response_json = json.loads(response.get_data(as_text=True))
         self.assertTrue("status" in response_json, "Response contains key: status")
@@ -42,7 +43,7 @@ class TestPelicanServer(unittest.TestCase):
         status_monitor = Mock()
         status_monitor.status = Status.DEACTIVATED
         self.setup_server(status_monitor, Mock())
-        response = self.app.get('/actions/activate', follow_redirects=True)
+        response = self.app_client.get('/actions/activate', follow_redirects=True)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         response_json = json.loads(response.get_data(as_text=True))
         self.assertEqual({"result": "activated"}, response_json, "Response states that the system is now activated")
@@ -51,7 +52,7 @@ class TestPelicanServer(unittest.TestCase):
         status_monitor = Mock()
         status_monitor.status = Status.ACTIVATED
         self.setup_server(status_monitor, Mock())
-        response = self.app.get('/actions/deactivate', follow_redirects=True)
+        response = self.app_client.get('/actions/deactivate', follow_redirects=True)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         response_json = json.loads(response.get_data(as_text=True))
         self.assertEqual({"result": "deactivated"}, response_json, "Response states that the system is now deactivated")
@@ -60,7 +61,7 @@ class TestPelicanServer(unittest.TestCase):
         status_monitor = Mock()
         status_monitor.status = Status.ACTIVATED
         self.setup_server(status_monitor, Mock())
-        response = self.app.get('/actions/activate', follow_redirects=True)
+        response = self.app_client.get('/actions/activate', follow_redirects=True)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         response_json = json.loads(response.get_data(as_text=True))
         self.assertEqual({"result": "already activated; no change"}, response_json, "Response states no change")
@@ -69,7 +70,7 @@ class TestPelicanServer(unittest.TestCase):
         status_monitor = Mock()
         status_monitor.status = Status.DEACTIVATED
         self.setup_server(status_monitor, Mock())
-        response = self.app.get('/actions/deactivate', follow_redirects=True)
+        response = self.app_client.get('/actions/deactivate', follow_redirects=True)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         response_json = json.loads(response.get_data(as_text=True))
         self.assertEqual({"result": "already deactivated; no change"}, response_json, "Response states no change")

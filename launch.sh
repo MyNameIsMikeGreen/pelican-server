@@ -14,6 +14,10 @@ source ${VENV_DIR}/bin/activate
 pip3 install -r requirements.txt
 
 
+echo "Running tests..."
+nosetests
+
+
 echo "Launching Pelican Server..."
 python3 src/pelicanserver.py
 

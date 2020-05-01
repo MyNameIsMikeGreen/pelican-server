@@ -30,3 +30,7 @@ class TestStatusMonitor(unittest.TestCase):
         time.sleep(self.TEST_TIMEOUT)   # After waiting for a new timeout period
         self.command_executor.deactivate.assert_called()
         self.status_monitor.set_active.assert_called_with(False, changed_by="automatic_deactivator")
+
+
+if __name__ == "__main__":
+    unittest.main()
