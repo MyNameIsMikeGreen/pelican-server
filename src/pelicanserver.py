@@ -55,7 +55,7 @@ class PelicanServer:
             if self.status_monitor.status == Status.ACTIVATED:
                 return jsonify({"result": "already activated; no change"})
             self.command_executor.activate()
-            self.status_monitor.set_active(True)
+            self.status_monitor.set_status(Status.ACTIVATED)
             self.automatic_deactivator.reset_timer(timeout_seconds)
             return jsonify({"result": "activated"})
 
@@ -64,7 +64,7 @@ class PelicanServer:
             if self.status_monitor.status == Status.DEACTIVATED:
                 return jsonify({"result": "already deactivated; no change"})
             self.command_executor.deactivate()
-            self.status_monitor.set_active(False)
+            self.status_monitor.set_status(Status.DEACTIVATED)
             return jsonify({"result": "deactivated"})
 
         return app

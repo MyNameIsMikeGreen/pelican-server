@@ -6,6 +6,8 @@ from unittest.mock import Mock
 
 from testfixtures import LogCapture
 
+from statusMonitor import Status
+
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/')))
 
 from automaticdeactivator import AutomaticDeactivator
@@ -28,7 +30,7 @@ class TestStatusMonitor(unittest.TestCase):
     def test_deactivate_called_after_timeout(self):
         time.sleep(self.TEST_TIMEOUT + 1)
         self.command_executor.deactivate.assert_called_with()
-        self.status_monitor.set_active.assert_called_with(False, changed_by="automatic_deactivator")
+        self.status_monitor.set_status.assert_called_with(Status.DEACTIVATED, changed_by="automatic_deactivator")
         self.log_capture.check(
             ("root", "INFO", "Automatic deactivation triggered.")
         )
@@ -38,10 +40,10 @@ class TestStatusMonitor(unittest.TestCase):
         self.automatic_deactivator.reset_timer()
         time.sleep((self.TEST_TIMEOUT / 2) + 0.1)  # Shortly after time of original timeout
         self.command_executor.deactivate.assert_not_called()
-        self.status_monitor.set_active.assert_not_called()
+        self.status_monitor.set_status.assert_not_called()
         time.sleep(self.TEST_TIMEOUT)  # After waiting for a new timeout period
         self.command_executor.deactivate.assert_called_with()
-        self.status_monitor.set_active.assert_called_with(False, changed_by="automatic_deactivator")
+        self.status_monitor.set_status.assert_called_with(Status.DEACTIVATED, changed_by="automatic_deactivator")
         self.log_capture.check(
             ('root', 'INFO', 'Timer initialised.'),
             ('root', 'INFO', 'Automatic deactivation triggered.')
@@ -53,7 +55,7 @@ class TestStatusMonitor(unittest.TestCase):
         self.automatic_deactivator.reset_timer(self.TEST_TIMEOUT / 10)  # Set minimal new timeout
         time.sleep(self.TEST_TIMEOUT + (self.TEST_TIMEOUT / 5))  # After new timeout but before original timeout
         self.command_executor.deactivate.assert_called_with()
-        self.status_monitor.set_active.assert_called_with(False, changed_by="automatic_deactivator")
+        self.status_monitor.set_status.assert_called_with(Status.DEACTIVATED, changed_by="automatic_deactivator")
         self.log_capture.check(
             ('root', 'INFO', 'Timer initialised.'),
             ('root', 'INFO', 'Automatic deactivation triggered.')

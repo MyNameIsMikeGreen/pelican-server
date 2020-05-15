@@ -17,11 +17,8 @@ class StatusMonitor:
         self._set_timestamp()
         self.last_change_by = "startup"
 
-    def set_active(self, active, changed_by="http_request"):
-        if active:
-            self.status = Status.ACTIVATED
-        else:
-            self.status = Status.DEACTIVATED
+    def set_status(self, status: Status, changed_by="http_request"):
+        self.status = status
         self._set_timestamp()
         self.last_change_by = changed_by
         self.logger.info("New status: " + str(self.status.name) + ".")

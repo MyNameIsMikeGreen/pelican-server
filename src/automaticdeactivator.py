@@ -32,4 +32,4 @@ class AutomaticDeactivator:
         if self.status_monitor.status == Status.DEACTIVATED:
             return
         self.command_executor.deactivate()
-        self.status_monitor.set_active(False, changed_by="automatic_deactivator")
+        self.status_monitor.set_status(Status.DEACTIVATED, changed_by="automatic_deactivator")
