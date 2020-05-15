@@ -3,7 +3,7 @@ import os
 import sys
 import unittest
 from subprocess import CalledProcessError
-from unittest.mock import Mock
+from unittest.mock import Mock, call
 
 from testfixtures import LogCapture
 
@@ -83,7 +83,9 @@ class TestPelicanServer(unittest.TestCase):
         )
         response = self.app_client.get('/actions/activate?timeout_seconds=1', follow_redirects=True)
         command_executor.activate.assert_called_with()
-        status_monitor.set_status.assert_called_with(Status.ACTIVATED)
+        status_monitor.set_status.assert_has_calls(
+            calls=[call(Status.MODIFYING),
+                   call(Status.ACTIVATED)])
         automatic_deactivator.reset_timer.assert_called_with(1)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         response_json = json.loads(response.get_data(as_text=True))
@@ -101,12 +103,14 @@ class TestPelicanServer(unittest.TestCase):
         )
         response = self.app_client.get('/actions/deactivate', follow_redirects=True)
         command_executor.deactivate.assert_called_with()
-        status_monitor.set_status.assert_called_with(Status.DEACTIVATED)
+        status_monitor.set_status.assert_has_calls(
+            calls=[call(Status.MODIFYING),
+                   call(Status.DEACTIVATED)])
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         response_json = json.loads(response.get_data(as_text=True))
         self.assertEqual({"result": "deactivated"}, response_json, "Response states that the system is now deactivated")
 
-    def test_server_returns_no_change_response_when_activation_called_and_already_active(self):
+    def test_server_returns_no_change_response_when_activation_called_and_already_activated(self):
         status_monitor = Mock()
         status_monitor.status = Status.ACTIVATED
         self.setup_server(status_monitor=status_monitor)
@@ -115,7 +119,7 @@ class TestPelicanServer(unittest.TestCase):
         response_json = json.loads(response.get_data(as_text=True))
         self.assertEqual({"result": "already activated; no change"}, response_json, "Response states no change")
 
-    def test_server_returns_deactivation_response_when_previously_activated(self):
+    def test_server_returns_deactivation_response_when_deactivation_called_and_already_deactivated(self):
         status_monitor = Mock()
         status_monitor.status = Status.DEACTIVATED
         self.setup_server(status_monitor=status_monitor)
@@ -123,6 +127,24 @@ class TestPelicanServer(unittest.TestCase):
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         response_json = json.loads(response.get_data(as_text=True))
         self.assertEqual({"result": "already deactivated; no change"}, response_json, "Response states no change")
+
+    def test_server_returns_modifying_response_when_activation_called_and_already_modifying(self):
+        status_monitor = Mock()
+        status_monitor.status = Status.MODIFYING
+        self.setup_server(status_monitor=status_monitor)
+        response = self.app_client.get('/actions/activate', follow_redirects=True)
+        self.assertEqual(200, response.status_code, "HTTP 200 returned")
+        response_json = json.loads(response.get_data(as_text=True))
+        self.assertEqual({"result": "system already modifying; no change"}, response_json, "Response states no change")
+
+    def test_server_returns_modifying_response_when_deactivation_called_and_already_modifying(self):
+        status_monitor = Mock()
+        status_monitor.status = Status.MODIFYING
+        self.setup_server(status_monitor=status_monitor)
+        response = self.app_client.get('/actions/deactivate', follow_redirects=True)
+        self.assertEqual(200, response.status_code, "HTTP 200 returned")
+        response_json = json.loads(response.get_data(as_text=True))
+        self.assertEqual({"result": "system already modifying; no change"}, response_json, "Response states no change")
 
     def test_server_aborts_on_failed_startup(self):
         command_executor = Mock()

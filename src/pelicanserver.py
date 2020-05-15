@@ -54,6 +54,9 @@ class PelicanServer:
             timeout_seconds = request.args.get('timeout_seconds', default=None, type=int)
             if self.status_monitor.status == Status.ACTIVATED:
                 return jsonify({"result": "already activated; no change"})
+            elif self.status_monitor.status == Status.MODIFYING:
+                return jsonify({"result": "system already modifying; no change"})
+            self.status_monitor.set_status(Status.MODIFYING)
             self.command_executor.activate()
             self.status_monitor.set_status(Status.ACTIVATED)
             self.automatic_deactivator.reset_timer(timeout_seconds)
@@ -63,6 +66,9 @@ class PelicanServer:
         def deactivate():
             if self.status_monitor.status == Status.DEACTIVATED:
                 return jsonify({"result": "already deactivated; no change"})
+            elif self.status_monitor.status == Status.MODIFYING:
+                return jsonify({"result": "system already modifying; no change"})
+            self.status_monitor.set_status(Status.MODIFYING)
             self.command_executor.deactivate()
             self.status_monitor.set_status(Status.DEACTIVATED)
             return jsonify({"result": "deactivated"})

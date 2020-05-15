@@ -4,6 +4,7 @@ from datetime import datetime
 
 
 class Status(enum.Enum):
+    MODIFYING = 2
     ACTIVATED = 1
     DEACTIVATED = 0
 
