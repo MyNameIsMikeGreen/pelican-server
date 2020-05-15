@@ -6,10 +6,9 @@ from unittest.mock import Mock
 
 from testfixtures import LogCapture
 
-from statusMonitor import Status
-
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/')))
 
+from statusMonitor import Status
 from automaticdeactivator import AutomaticDeactivator
 
 
