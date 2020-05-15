@@ -27,7 +27,7 @@ class TestStatusMonitor(unittest.TestCase):
 
     def test_deactivate_called_after_timeout(self):
         time.sleep(self.TEST_TIMEOUT + 1)
-        # self.command_executor.deactivate.assert_called()
+        self.command_executor.deactivate.assert_called_with()
         self.status_monitor.set_active.assert_called_with(False, changed_by="automatic_deactivator")
         self.log_capture.check(
             ("root", "INFO", "Automatic deactivation triggered.")
@@ -40,7 +40,7 @@ class TestStatusMonitor(unittest.TestCase):
         self.command_executor.deactivate.assert_not_called()
         self.status_monitor.set_active.assert_not_called()
         time.sleep(self.TEST_TIMEOUT)  # After waiting for a new timeout period
-        # self.command_executor.deactivate.assert_called()
+        self.command_executor.deactivate.assert_called_with()
         self.status_monitor.set_active.assert_called_with(False, changed_by="automatic_deactivator")
         self.log_capture.check(
             ('root', 'INFO', 'Timer initialised.'),
