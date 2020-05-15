@@ -56,8 +56,35 @@ class TestPelicanServer(unittest.TestCase):
     def test_server_returns_activation_response_when_activation_occurs(self):
         status_monitor = Mock()
         status_monitor.status = Status.DEACTIVATED
-        self.setup_server(status_monitor=status_monitor)
+        automatic_deactivator = Mock()
+        command_executor = Mock()
+        self.setup_server(
+            status_monitor=status_monitor,
+            automatic_deactivator=automatic_deactivator,
+            command_executor=command_executor
+        )
         response = self.app_client.get('/actions/activate', follow_redirects=True)
+        command_executor.activate.assert_called_with()
+        status_monitor.set_active.assert_called_with(True)
+        automatic_deactivator.reset_timer.assert_called_with(None)
+        self.assertEqual(200, response.status_code, "HTTP 200 returned")
+        response_json = json.loads(response.get_data(as_text=True))
+        self.assertEqual({"result": "activated"}, response_json, "Response states that the system is now activated")
+
+    def test_server_returns_activation_response_when_activation_occurs_with_custom_timeout(self):
+        status_monitor = Mock()
+        status_monitor.status = Status.DEACTIVATED
+        automatic_deactivator = Mock()
+        command_executor = Mock()
+        self.setup_server(
+            status_monitor=status_monitor,
+            automatic_deactivator=automatic_deactivator,
+            command_executor=command_executor
+        )
+        response = self.app_client.get('/actions/activate?timeout_seconds=1', follow_redirects=True)
+        command_executor.activate.assert_called_with()
+        status_monitor.set_active.assert_called_with(True)
+        automatic_deactivator.reset_timer.assert_called_with(1)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         response_json = json.loads(response.get_data(as_text=True))
         self.assertEqual({"result": "activated"}, response_json, "Response states that the system is now activated")
@@ -65,8 +92,16 @@ class TestPelicanServer(unittest.TestCase):
     def test_server_returns_deactivation_response_when_deactivation_occurs(self):
         status_monitor = Mock()
         status_monitor.status = Status.ACTIVATED
-        self.setup_server(status_monitor=status_monitor)
+        automatic_deactivator = Mock()
+        command_executor = Mock()
+        self.setup_server(
+            status_monitor=status_monitor,
+            automatic_deactivator=automatic_deactivator,
+            command_executor=command_executor
+        )
         response = self.app_client.get('/actions/deactivate', follow_redirects=True)
+        command_executor.deactivate.assert_called_with()
+        status_monitor.set_active.assert_called_with(False)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         response_json = json.loads(response.get_data(as_text=True))
         self.assertEqual({"result": "deactivated"}, response_json, "Response states that the system is now deactivated")
