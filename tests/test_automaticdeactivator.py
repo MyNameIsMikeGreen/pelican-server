@@ -47,6 +47,18 @@ class TestStatusMonitor(unittest.TestCase):
             ('root', 'INFO', 'Automatic deactivation triggered.')
         )
 
+    def test_timer_resets_with_custom_timeout_correctly(self):
+        time.sleep(self.TEST_TIMEOUT / 2)  # Before original timeout
+        self.command_executor.deactivate.assert_not_called()
+        self.automatic_deactivator.reset_timer(self.TEST_TIMEOUT / 10)  # Set minimal new timeout
+        time.sleep(self.TEST_TIMEOUT + (self.TEST_TIMEOUT / 5))  # After new timeout but before original timeout
+        self.command_executor.deactivate.assert_called_with()
+        self.status_monitor.set_active.assert_called_with(False, changed_by="automatic_deactivator")
+        self.log_capture.check(
+            ('root', 'INFO', 'Timer initialised.'),
+            ('root', 'INFO', 'Automatic deactivation triggered.')
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

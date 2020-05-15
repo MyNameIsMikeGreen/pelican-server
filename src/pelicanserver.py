@@ -1,7 +1,7 @@
 import logging
 from subprocess import CalledProcessError
 
-from flask import Flask, jsonify, send_from_directory
+from flask import Flask, jsonify, send_from_directory, request
 
 from automaticdeactivator import AutomaticDeactivator
 from commands import CommandExecutor
@@ -51,11 +51,12 @@ class PelicanServer:
 
         @app.route("/actions/activate")
         def activate():
+            timeout_seconds = request.args.get('timeout_seconds', default=None, type=int)
             if self.status_monitor.status == Status.ACTIVATED:
                 return jsonify({"result": "already activated; no change"})
             self.command_executor.activate()
             self.status_monitor.set_active(True)
-            self.automatic_deactivator.reset_timer()
+            self.automatic_deactivator.reset_timer(timeout_seconds)
             return jsonify({"result": "activated"})
 
         @app.route("/actions/deactivate")
