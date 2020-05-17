@@ -1,3 +1,4 @@
+import datetime
 import logging
 from threading import Timer
 
@@ -20,12 +21,14 @@ class AutomaticDeactivator:
         if timeout_seconds:
             self.timeout_seconds = timeout_seconds
         self.timer.cancel()
-        self._initialise_timer(self.timeout_seconds)
+        return self._initialise_timer(self.timeout_seconds)
 
     def _initialise_timer(self, timeout_seconds):
         self.timer = Timer(timeout_seconds, self._deactivate)
+        time_now = datetime.datetime.now()
         self.timer.start()
         self.logger.info("Timer initialised.")
+        return time_now + datetime.timedelta(seconds=timeout_seconds)
 
     def _deactivate(self):
         self.logger.info("Automatic deactivation triggered.")

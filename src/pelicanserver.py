@@ -46,7 +46,8 @@ class PelicanServer:
             return jsonify({
                 "status": self.status_monitor.status.name,
                 "lastChange": str(self.status_monitor.last_change),
-                "lastChangeBy": self.status_monitor.last_change_by
+                "lastChangeBy": self.status_monitor.last_change_by,
+                "scheduledDeactivation": self.status_monitor.scheduled_deactivation
             })
 
         @app.route("/actions/activate")
@@ -58,8 +59,8 @@ class PelicanServer:
                 return jsonify({"result": "system already modifying; no change"})
             self.status_monitor.set_status(Status.MODIFYING)
             self.command_executor.activate()
-            self.status_monitor.set_status(Status.ACTIVATED)
-            self.automatic_deactivator.reset_timer(timeout_seconds)
+            scheduled_deactivation = self.automatic_deactivator.reset_timer(timeout_seconds)
+            self.status_monitor.set_status(Status.ACTIVATED, scheduled_deactivation=scheduled_deactivation)
             return jsonify({"result": "activated"})
 
         @app.route("/actions/deactivate")
@@ -70,7 +71,7 @@ class PelicanServer:
                 return jsonify({"result": "system already modifying; no change"})
             self.status_monitor.set_status(Status.MODIFYING)
             self.command_executor.deactivate()
-            self.status_monitor.set_status(Status.DEACTIVATED)
+            self.status_monitor.set_status(Status.DEACTIVATED, scheduled_deactivation=None)
             return jsonify({"result": "deactivated"})
 
         return app

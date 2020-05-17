@@ -3,7 +3,7 @@ import os
 import sys
 import unittest
 from subprocess import CalledProcessError
-from unittest.mock import Mock, call
+from unittest.mock import Mock, call, ANY
 
 from testfixtures import LogCapture
 
@@ -52,6 +52,7 @@ class TestPelicanServer(unittest.TestCase):
         self.assertTrue("status" in response_json, "Response contains key: status")
         self.assertTrue("lastChange" in response_json, "Response contains key: lastChange")
         self.assertTrue("lastChangeBy" in response_json, "Response contains key: lastChangeBy")
+        self.assertTrue("scheduledDeactivation" in response_json, "Response contains key: scheduledDeactivation")
 
     def test_server_returns_activation_response_when_activation_occurs(self):
         status_monitor = Mock()
@@ -65,7 +66,7 @@ class TestPelicanServer(unittest.TestCase):
         )
         response = self.app_client.get('/actions/activate', follow_redirects=True)
         command_executor.activate.assert_called_with()
-        status_monitor.set_status.assert_called_with(Status.ACTIVATED)
+        status_monitor.set_status.assert_called_with(Status.ACTIVATED, scheduled_deactivation=ANY)
         automatic_deactivator.reset_timer.assert_called_with(None)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         response_json = json.loads(response.get_data(as_text=True))
@@ -85,7 +86,7 @@ class TestPelicanServer(unittest.TestCase):
         command_executor.activate.assert_called_with()
         status_monitor.set_status.assert_has_calls(
             calls=[call(Status.MODIFYING),
-                   call(Status.ACTIVATED)])
+                   call(Status.ACTIVATED, scheduled_deactivation=ANY)])
         automatic_deactivator.reset_timer.assert_called_with(1)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         response_json = json.loads(response.get_data(as_text=True))
@@ -105,7 +106,7 @@ class TestPelicanServer(unittest.TestCase):
         command_executor.deactivate.assert_called_with()
         status_monitor.set_status.assert_has_calls(
             calls=[call(Status.MODIFYING),
-                   call(Status.DEACTIVATED)])
+                   call(Status.DEACTIVATED, scheduled_deactivation=ANY)])
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         response_json = json.loads(response.get_data(as_text=True))
         self.assertEqual({"result": "deactivated"}, response_json, "Response states that the system is now deactivated")

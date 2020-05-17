@@ -24,11 +24,13 @@ class TestStatusMonitor(unittest.TestCase):
     def test_status_monitor_status_changes_successfully(self):
         original_timestamp = self.status_monitor.last_change
         changed_by_string = "test"
+        scheduled_deactivation_string = "test2"
         new_status = Status.ACTIVATED
-        self.status_monitor.set_status(new_status, changed_by=changed_by_string)
+        self.status_monitor.set_status(new_status, changed_by=changed_by_string, scheduled_deactivation=scheduled_deactivation_string)
         self.assertEqual(new_status, self.status_monitor.status)
         self.assertGreater(self.status_monitor.last_change, original_timestamp)
         self.assertEqual(self.status_monitor.last_change_by, changed_by_string)
+        self.assertEqual(self.status_monitor.scheduled_deactivation, scheduled_deactivation_string)
         self.log_capture.check(
             ("root", "INFO", "New status: " + new_status.name + ".")
         )

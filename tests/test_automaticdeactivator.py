@@ -1,3 +1,4 @@
+import datetime
 import os
 import sys
 import time
@@ -36,7 +37,8 @@ class TestStatusMonitor(unittest.TestCase):
 
     def test_timer_resets_correctly(self):
         time.sleep(self.TEST_TIMEOUT / 2)  # Before original timeout
-        self.automatic_deactivator.reset_timer()
+        scheduled_deactivation = self.automatic_deactivator.reset_timer()
+        time_of_reset = datetime.datetime.now()
         time.sleep((self.TEST_TIMEOUT / 2) + 0.1)  # Shortly after time of original timeout
         self.command_executor.deactivate.assert_not_called()
         self.status_monitor.set_status.assert_not_called()
@@ -47,6 +49,10 @@ class TestStatusMonitor(unittest.TestCase):
             ('root', 'INFO', 'Timer initialised.'),
             ('root', 'INFO', 'Automatic deactivation triggered.')
         )
+        self.assertGreaterEqual(scheduled_deactivation,
+                                time_of_reset
+                                + datetime.timedelta(seconds=self.TEST_TIMEOUT)
+                                - datetime.timedelta(seconds=self.TEST_TIMEOUT/2), "Returns a time near the current time plus timeout")
 
     def test_timer_resets_with_custom_timeout_correctly(self):
         time.sleep(self.TEST_TIMEOUT / 2)  # Before original timeout
