@@ -60,7 +60,8 @@ class PelicanServer:
             self.status_monitor.set_status(Status.MODIFYING)
             self.command_executor.activate()
             scheduled_deactivation = self.automatic_deactivator.reset_timer(timeout_seconds)
-            self.status_monitor.set_status(Status.ACTIVATED, scheduled_deactivation=scheduled_deactivation)
+            formatted_scheduled_deactivation = scheduled_deactivation.strftime("%Y-%m-%d %H:%M:%S")
+            self.status_monitor.set_status(Status.ACTIVATED, scheduled_deactivation=formatted_scheduled_deactivation)
             return jsonify({"result": "activated"})
 
         @app.route("/actions/deactivate")
