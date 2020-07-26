@@ -16,6 +16,8 @@ class TestCommandExecutor(unittest.TestCase):
         null_command = ":"
         self.command_executor.minidlna_restart_command = null_command
         self.command_executor.minidlna_stop_command = null_command
+        self.command_executor.minidlna_restart_command = null_command
+        self.command_executor.minidlna_rescan_command = null_command
         self.command_executor.mount_command_template = null_command
         self.command_executor.unmount_command_template = null_command
         self.log_capture = LogCapture()
@@ -48,4 +50,11 @@ class TestCommandExecutor(unittest.TestCase):
         self.log_capture.check(
             ("root", "INFO", "Stopping minidlna."),
             ("root", "INFO", "Unmounting '/dev/sda'.")
+        )
+
+    def test_library_rescanned(self):
+        self.command_executor.rescan()
+        self.log_capture.check(
+            ("root", "INFO", "Rescanning libraries."),
+            ("root", "INFO", "Restarting minidlna.")
         )

@@ -157,6 +157,43 @@ class TestPelicanServer(unittest.TestCase):
                                  'MiniDLNA may not be installed. Aborting...')
         )
 
+    def test_server_returns_activation_response_when_rescan_occurs(self):
+        status_monitor = Mock()
+        status_monitor.status = Status.ACTIVATED
+        automatic_deactivator = Mock()
+        command_executor = Mock()
+        self.setup_server(
+            status_monitor=status_monitor,
+            automatic_deactivator=automatic_deactivator,
+            command_executor=command_executor
+        )
+        response = self.app_client.get('/actions/rescan', follow_redirects=True)
+        command_executor.rescan.assert_called_with()
+        status_monitor.set_status.assert_has_calls(
+            calls=[call(Status.MODIFYING),
+                   call(Status.ACTIVATED, scheduled_deactivation=ANY)])
+        self.assertEqual(200, response.status_code, "HTTP 200 returned")
+        response_json = json.loads(response.get_data(as_text=True))
+        self.assertEqual({"result": "activated"}, response_json, "Response states that the system is now activated")
+
+    def test_server_returns_modifying_response_when_rescan_called_and_already_modifying(self):
+        status_monitor = Mock()
+        status_monitor.status = Status.MODIFYING
+        self.setup_server(status_monitor=status_monitor)
+        response = self.app_client.get('/actions/rescan', follow_redirects=True)
+        self.assertEqual(200, response.status_code, "HTTP 200 returned")
+        response_json = json.loads(response.get_data(as_text=True))
+        self.assertEqual({"result": "system already modifying; no change"}, response_json, "Response states no change")
+
+    def test_server_returns_deactivation_response_when_rescan_called_and_already_deactivated(self):
+        status_monitor = Mock()
+        status_monitor.status = Status.DEACTIVATED
+        self.setup_server(status_monitor=status_monitor)
+        response = self.app_client.get('/actions/rescan', follow_redirects=True)
+        self.assertEqual(200, response.status_code, "HTTP 200 returned")
+        response_json = json.loads(response.get_data(as_text=True))
+        self.assertEqual({"result": "rescan must only occur when activated; no change"}, response_json, "Response states no change")
+
 
 if __name__ == "__main__":
     unittest.main()

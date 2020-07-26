@@ -9,6 +9,8 @@ class CommandExecutor:
 
     minidlna_restart_command = "sudo service minidlna restart"
     minidlna_stop_command = "sudo service minidlna stop"
+    minidlna_restart_command = "sudo service minidlna restart"
+    minidlna_rescan_command = "sudo service minidlna restart"
     mount_command_template = "sudo mount {device} {mount_point}"
     unmount_command_template = "sudo eject {device}"
 
@@ -28,6 +30,10 @@ class CommandExecutor:
         self._stop_minidlna()
         for device in self.devices:
             self._unmount(device["path"])
+
+    def rescan(self):
+        self._rescan_minidlna_library()
+        self._restart_minidlna()
 
     def _mount(self, device, mount_point):
         self.logger.info("Mounting '" + device + "' at '" + mount_point + "'.")
@@ -50,3 +56,11 @@ class CommandExecutor:
     def _stop_minidlna(self):
         self.logger.info("Stopping minidlna.")
         subprocess.check_call(self.minidlna_stop_command, shell=True)
+
+    def _restart_minidlna(self):
+        self.logger.info("Restarting minidlna.")
+        subprocess.check_call(self.minidlna_restart_command, shell=True)
+
+    def _rescan_minidlna_library(self):
+        self.logger.info("Rescanning libraries.")
+        subprocess.check_call(self.minidlna_rescan_command, shell=True)

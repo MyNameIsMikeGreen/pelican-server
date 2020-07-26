@@ -75,6 +75,20 @@ class PelicanServer:
             self.status_monitor.set_status(Status.DEACTIVATED, scheduled_deactivation=None)
             return jsonify({"result": "deactivated"})
 
+        @app.route("/actions/rescan")
+        def rescan():
+            timeout_seconds = request.args.get('timeout_seconds', default=None, type=int)
+            if self.status_monitor.status == Status.DEACTIVATED:
+                return jsonify({"result": "rescan must only occur when activated; no change"})
+            elif self.status_monitor.status == Status.MODIFYING:
+                return jsonify({"result": "system already modifying; no change"})
+            self.status_monitor.set_status(Status.MODIFYING)
+            self.command_executor.rescan()
+            scheduled_deactivation = self.automatic_deactivator.reset_timer(timeout_seconds)
+            formatted_scheduled_deactivation = scheduled_deactivation.strftime("%Y-%m-%d %H:%M:%S")
+            self.status_monitor.set_status(Status.ACTIVATED, scheduled_deactivation=formatted_scheduled_deactivation)
+            return jsonify({"result": "activated"})
+
         return app
 
 
