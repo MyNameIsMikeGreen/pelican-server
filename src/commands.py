@@ -9,7 +9,7 @@ class CommandExecutor:
 
     minidlna_restart_command = "sudo service minidlna restart"
     minidlna_stop_command = "sudo service minidlna stop"
-    minidlna_rescan_command = "sudo service minidlna restart"
+    minidlna_rescan_command = "sudo minidlnad -R"
     mount_command_template = "sudo mount {device} {mount_point}"
     unmount_command_template = "sudo eject {device}"
 
