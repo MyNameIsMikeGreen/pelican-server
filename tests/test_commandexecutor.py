@@ -42,7 +42,7 @@ class TestCommandExecutor(unittest.TestCase):
         self.command_executor.activate()
         self.log_capture.check(
             ("root", "INFO", "Mounting '/dev/sda1' at '/media/my_mount_point'."),
-            ("root", "INFO", "Starting minidlna.")
+            ("root", "INFO", "Restarting minidlna.")
         )
 
     def test_each_device_unmounted(self):
