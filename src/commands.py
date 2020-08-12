@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import subprocess
 
 
@@ -36,6 +37,7 @@ class CommandExecutor:
 
     def _mount(self, device, mount_point):
         self.logger.info("Mounting '" + device + "' at '" + mount_point + "'.")
+        os.makedirs(mount_point, exist_ok=True)
         subprocess.check_call(self.mount_command_template.format(device=device, mount_point=mount_point), shell=True)
 
     def _unmount(self, device, retries_count=5):
