@@ -2,6 +2,7 @@ import logging
 from subprocess import CalledProcessError
 
 from flask import Flask, jsonify, send_from_directory, request
+from flask_cors import CORS
 
 from automaticdeactivator import AutomaticDeactivator
 from commands import CommandExecutor
@@ -31,6 +32,7 @@ class PelicanServer:
 
     def _create_app(self):
         app = Flask(__name__)
+        CORS(app, resources={r"/*": {"origins": "*"}})
 
         @app.route("/")
         def root():
