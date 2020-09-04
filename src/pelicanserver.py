@@ -31,12 +31,12 @@ class PelicanServer:
         self.app = self._create_app()
 
     def _create_app(self):
-        app = Flask(__name__)
+        app = Flask(__name__, static_folder='../build', static_url_path='/')
         CORS(app, resources={r"/*": {"origins": "*"}})
 
         @app.route("/")
         def root():
-            return static_content("index.html")
+            return app.send_static_file('index.html')
 
         @app.route('/<path:path>')
         def static_content(path):

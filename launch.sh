@@ -28,6 +28,11 @@ else
 fi
 
 
+echo "Building frontend..."
+npm install
+npm run build
+
+
 echo "Launching Pelican Server..."
 python3 src/pelicanserver.py
 
