@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-const HOST = 'http://localhost:8000';
+const IP_ADDRESS = window.location.hostname;
+const HOST = 'http://' + IP_ADDRESS + ':8000';
 const STATUS_ENDPOINT = HOST + '/status';
 const ACTIVATE_ENDPOINT = HOST + '/actions/activate';
 const DEACTIVATE_ENDPOINT = HOST + '/actions/deactivate';
