@@ -8,6 +8,8 @@ const ACTIVATE_ENDPOINT = ORIGIN + '/actions/activate';
 const DEACTIVATE_ENDPOINT = ORIGIN + '/actions/deactivate';
 const RESCAN_ENDPOINT = ORIGIN + '/actions/rescan';
 
+const DEFAULT_ACTIVATION_TIMEOUT = 3600;
+
 class Main extends React.Component {
 
     status = setInterval(() =>  {fetch(STATUS_ENDPOINT)
@@ -19,7 +21,15 @@ class Main extends React.Component {
         super(props);
         this.state = {
             status: "NOT CONNECTED",
+            activationTimeoutSeconds: DEFAULT_ACTIVATION_TIMEOUT
         };
+        this.activationTimeoutChangeHandler = this.activationTimeoutChangeHandler.bind(this);
+    }
+
+    activationTimeoutChangeHandler(event) {
+        this.setState({
+            activationTimeoutSeconds: event.target.value
+        })
     }
 
     render() {
@@ -27,11 +37,13 @@ class Main extends React.Component {
             <>
                 <h1>Status: {this.state.status}</h1>
                 <br />
-                <ActionButton label={"ACTIVATE"} action={() => actionActivate()} disabled={this.state.status !== 'DEACTIVATED'}/>
+                <ActionButton label={"ACTIVATE"} action={() => actionActivate(this.state.activationTimeoutSeconds)} disabled={this.state.status !== 'DEACTIVATED'}/>
                 <br />
                 <ActionButton label={"DEACTIVATE"} action={() => actionDeactivate()} disabled={this.state.status !== 'ACTIVATED'}/>
                 <br />
                 <ActionButton label={"RESCAN"} action={() => actionRescan()} disabled={this.state.status !== 'ACTIVATED'}/>
+                <br />
+                <ActivationTimeoutForm activationTimeoutChangeHandler={this.activationTimeoutChangeHandler} />
             </>
         );
     }
@@ -45,8 +57,21 @@ class ActionButton extends React.Component {
     }
 }
 
-function actionActivate() {
-    executeAndLogGetRequest(ACTIVATE_ENDPOINT + '?timeout_seconds=600'); // TODO: Variable timeout
+class ActivationTimeoutForm extends React.Component {
+    render() {
+        return (
+            <form>
+                <label>
+                    Activation Timeout (Seconds):
+                    <input type="number" defaultValue={DEFAULT_ACTIVATION_TIMEOUT} onChange={this.props.activationTimeoutChangeHandler} />
+                </label>
+            </form>
+        );
+    }
+}
+
+function actionActivate(timeoutSeconds) {
+    executeAndLogGetRequest(ACTIVATE_ENDPOINT + '?timeout_seconds=' + timeoutSeconds);
 }
 
 function actionDeactivate() {
