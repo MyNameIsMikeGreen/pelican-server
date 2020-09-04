@@ -2,12 +2,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 
-const IP_ADDRESS = window.location.hostname;
-const HOST = 'http://' + IP_ADDRESS + ':8000';
-const STATUS_ENDPOINT = HOST + '/status';
-const ACTIVATE_ENDPOINT = HOST + '/actions/activate';
-const DEACTIVATE_ENDPOINT = HOST + '/actions/deactivate';
-const RESCAN_ENDPOINT = HOST + '/actions/rescan';
+const ORIGIN = window.location.origin;
+const STATUS_ENDPOINT = ORIGIN + '/status';
+const ACTIVATE_ENDPOINT = ORIGIN + '/actions/activate';
+const DEACTIVATE_ENDPOINT = ORIGIN + '/actions/deactivate';
+const RESCAN_ENDPOINT = ORIGIN + '/actions/rescan';
 
 class Main extends React.Component {
 
