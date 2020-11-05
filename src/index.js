@@ -8,7 +8,8 @@ const ACTIVATE_ENDPOINT = ORIGIN + '/actions/activate';
 const DEACTIVATE_ENDPOINT = ORIGIN + '/actions/deactivate';
 const RESCAN_ENDPOINT = ORIGIN + '/actions/rescan';
 
-const DEFAULT_ACTIVATION_TIMEOUT = 3600;
+const DEFAULT_ACTIVATION_TIMEOUT_HOURS = 6;
+const SECONDS_TO_HOURS_MULTIPLIER = 3600;
 
 class Main extends React.Component {
 
@@ -21,14 +22,14 @@ class Main extends React.Component {
         super(props);
         this.state = {
             status: "NOT CONNECTED",
-            activationTimeoutSeconds: DEFAULT_ACTIVATION_TIMEOUT
+            activationTimeoutSeconds: DEFAULT_ACTIVATION_TIMEOUT_HOURS * SECONDS_TO_HOURS_MULTIPLIER
         };
         this.activationTimeoutChangeHandler = this.activationTimeoutChangeHandler.bind(this);
     }
 
     activationTimeoutChangeHandler(event) {
         this.setState({
-            activationTimeoutSeconds: event.target.value
+            activationTimeoutSeconds: event.target.value * SECONDS_TO_HOURS_MULTIPLIER
         })
     }
 
@@ -62,8 +63,8 @@ class ActivationTimeoutForm extends React.Component {
         return (
             <form>
                 <label>
-                    Activation Timeout (Seconds):
-                    <input type="number" defaultValue={DEFAULT_ACTIVATION_TIMEOUT} onChange={this.props.activationTimeoutChangeHandler} />
+                    Activation Timeout (Hours):
+                    <input type="number" defaultValue={DEFAULT_ACTIVATION_TIMEOUT_HOURS} onChange={this.props.activationTimeoutChangeHandler} />
                 </label>
             </form>
         );
