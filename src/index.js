@@ -80,8 +80,7 @@ function actionActivate(timeoutSeconds) {
 function actionActivateUntilMidnight() {
     const now = new Date();
 
-    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDay(), 0 ,0, 0, 0);
-    midnight.setDate(midnight.getDay() + 1);
+    const midnight = new Date(2020, 11, 28, 0 ,0, 0, 0);
 
     actionActivate(dateDeltaSeconds(now, midnight))
 }
