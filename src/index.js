@@ -83,7 +83,7 @@ function actionActivateUntilMidnight() {
     const midnight = new Date();
     midnight.setDate(new now.getDate()+1);
 
-    executeAndLogGetRequest(ACTIVATE_ENDPOINT + '?timeout_seconds=' + dateDeltaSeconds(now, midnight));
+    actionActivate(dateDeltaSeconds(now, midnight))
 }
 
 function dateDeltaSeconds(date1, date2){
