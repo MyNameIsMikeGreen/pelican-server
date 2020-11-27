@@ -40,6 +40,8 @@ class Main extends React.Component {
                 <br />
                 <ActionButton label={"ACTIVATE"} action={() => actionActivate(this.state.activationTimeoutSeconds)} disabled={this.state.status !== 'DEACTIVATED'}/>
                 <br />
+                <ActionButton label={"ACTIVATE UNTIL MIDNIGHT"} action={() => actionActivateUntilMidnight()} disabled={this.state.status !== 'DEACTIVATED'}/>
+                <br />
                 <ActionButton label={"DEACTIVATE"} action={() => actionDeactivate()} disabled={this.state.status !== 'ACTIVATED'}/>
                 <br />
                 <ActionButton label={"RESCAN"} action={() => actionRescan()} disabled={this.state.status !== 'ACTIVATED'}/>
@@ -73,6 +75,17 @@ class ActivationTimeoutForm extends React.Component {
 
 function actionActivate(timeoutSeconds) {
     executeAndLogGetRequest(ACTIVATE_ENDPOINT + '?timeout_seconds=' + timeoutSeconds);
+}
+
+function actionActivateUntilMidnight() {
+    const now = new Date();
+    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+    const secondsUntilMidnight = dateDeltaSeconds(now, midnight);
+    actionActivate(secondsUntilMidnight)
+}
+
+function dateDeltaSeconds(date1, date2) {
+    return Math.trunc((date2.getTime() - date1.getTime()) / 1000)
 }
 
 function actionDeactivate() {
