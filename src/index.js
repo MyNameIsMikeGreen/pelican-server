@@ -82,6 +82,10 @@ function actionActivateUntilMidnight() {
 
     const midnight = new Date();
     midnight.setDate(now.getDate()+1);
+    midnight.setHours(0);
+    midnight.setMinutes(0);
+    midnight.setSeconds(0);
+    midnight.setMilliseconds(0);
 
     actionActivate(dateDeltaSeconds(now, midnight))
 }
