@@ -78,15 +78,10 @@ function actionActivate(timeoutSeconds) {
 }
 
 function actionActivateUntilMidnight() {
-    const now = new Date();
-
-    const midnight = new Date(2020, 11, 28, 0 ,0, 0, 0);
-
-    actionActivate(dateDeltaSeconds(now, midnight))
-}
-
-function dateDeltaSeconds(date1, date2){
-    return (date2 - date1) / 1000;
+    let now = new Date();
+    let midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+    const secondsUntilMidnight = Math.trunc((midnight.getTime() - now.getTime()) / 1000);
+    actionActivate(secondsUntilMidnight)
 }
 
 function actionDeactivate() {
