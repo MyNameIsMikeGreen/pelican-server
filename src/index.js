@@ -78,13 +78,14 @@ function actionActivate(timeoutSeconds) {
 }
 
 function actionActivateUntilMidnight() {
-    let now = new Date();
-    console.log(now)
-    let midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
-    console.log(midnight)
-    const secondsUntilMidnight = Math.trunc((midnight.getTime() - now.getTime()) / 1000);
-    console.log(secondsUntilMidnight)
+    const now = new Date();
+    const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 0);
+    const secondsUntilMidnight = dateDeltaSeconds(now, midnight);
     actionActivate(secondsUntilMidnight)
+}
+
+function dateDeltaSeconds(date1, date2) {
+    return Math.trunc((date2.getTime() - date1.getTime()) / 1000)
 }
 
 function actionDeactivate() {
