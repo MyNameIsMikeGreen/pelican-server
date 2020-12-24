@@ -18,13 +18,15 @@ fi
 source ${VENV_DIR}/bin/activate
 pip3 install -r requirements.txt
 
-
-echo "Running tests..."
-if pytest ; then
-    echo "Tests completed successfully."
-else
-    echo "Tests failed. Launch aborted."
-    exit 1
+if [[ $# -eq 0 || $1 != "--skip-tests" ]] ; then
+    echo "Running tests..."
+    if pytest ; then
+        echo "Tests completed successfully."
+    else
+        echo "Tests failed. Launch aborted."
+        exit 1
+    fi
+else echo "Tests skipped."
 fi
 
 
