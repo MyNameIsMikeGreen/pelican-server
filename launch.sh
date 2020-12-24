@@ -18,6 +18,7 @@ fi
 source ${VENV_DIR}/bin/activate
 pip3 install -r requirements.txt
 
+
 if [[ $# -eq 0 || $1 != "--skip-tests" ]] ; then
     echo "Running tests..."
     if pytest ; then
