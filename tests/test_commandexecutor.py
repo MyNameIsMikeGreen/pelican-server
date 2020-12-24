@@ -8,6 +8,7 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../s
 
 from commands import CommandExecutor
 
+DUMMY_MOUNT_POINT = "tests/testresources/dummyMountPoint"
 
 class TestCommandExecutor(unittest.TestCase):
 
@@ -25,13 +26,17 @@ class TestCommandExecutor(unittest.TestCase):
     def tearDown(self):
         self.log_capture.uninstall_all()
 
+    @classmethod
+    def tearDownClass(cls):
+        os.rmdir(DUMMY_MOUNT_POINT)
+
     def test_device_config_loaded_successfully(self):
         expected_device_entry = {
                 "path": "/dev/sda",
                 "partitions": [
                     {
                         "path": "/dev/sda1",
-                        "mountPoint": "/media/my_mount_point"
+                        "mountPoint": DUMMY_MOUNT_POINT
                     }
                 ]
             }
@@ -41,7 +46,7 @@ class TestCommandExecutor(unittest.TestCase):
     def test_each_partition_mounted(self):
         self.command_executor.activate()
         self.log_capture.check(
-            ("root", "INFO", "Mounting '/dev/sda1' at '/media/my_mount_point'."),
+            ("root", "INFO", f"Mounting '/dev/sda1' at '{DUMMY_MOUNT_POINT}'."),
             ("root", "INFO", "Restarting minidlna.")
         )
 

@@ -28,21 +28,11 @@ class TestPelicanServer(unittest.TestCase):
         self.pelican_server.app.config['TESTING'] = True
         self.app_client = self.pelican_server.app.test_client()
 
-    def test_server_returns_static_homepage(self):
-        self.setup_server()
-        response = self.app_client.get('/', follow_redirects=True)
-        self.assertEqual(200, response.status_code, "HTTP 200 returned")
-        with open(os.path.dirname(__file__) + "/testresources/index.html") as index_page:
-            expected_content = index_page.read()
-            self.assertEqual(expected_content, response.data.decode("utf-8"), "Static index.html file returned")
-
     def test_server_returns_index_page(self):
         self.setup_server()
         response = self.app_client.get('/index.html', follow_redirects=True)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
-        with open(os.path.dirname(__file__) + "/testresources/index.html") as index_page:
-            expected_content = index_page.read()
-            self.assertEqual(expected_content, response.data.decode("utf-8"), "Static index.html file returned")
+        self.assertTrue("<title>Pelican Web App</title>" in response.data.decode("utf-8"), "Index page has correct title")
 
     def test_server_returns_status(self):
         self.setup_server()
