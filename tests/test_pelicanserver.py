@@ -3,14 +3,15 @@ import os
 import sys
 import unittest
 from subprocess import CalledProcessError
-from unittest.mock import Mock, call, ANY
+from unittest.mock import Mock, ANY
 
+from pubsub import pub
 from testfixtures import LogCapture
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/')))
 
 import pelicanserver
-from statusMonitor import StatusMonitor, Status
+from statusmonitor import StatusMonitor, Status
 
 AUTOMATIC_DEACTIVATOR_TIMEOUT_SECONDS = 3
 
@@ -19,6 +20,18 @@ class TestPelicanServer(unittest.TestCase):
 
     def setUp(self):
         self.log_capture = LogCapture()
+        self.status_change_messages = []
+        pub.subscribe(self._save_status_change_message, StatusMonitor.TOPIC)
+
+    def _save_status_change_message(self, status=None, changed_by=None, scheduled_deactivation=None):
+        new_message = {}
+        if status:
+            new_message["status"] = status
+        if changed_by:
+            new_message["changed_by"] = changed_by
+        if scheduled_deactivation:
+            new_message["scheduled_deactivation"] = scheduled_deactivation
+        self.status_change_messages.append(new_message)
 
     def tearDown(self):
         self.log_capture.uninstall_all()
@@ -56,7 +69,7 @@ class TestPelicanServer(unittest.TestCase):
         )
         response = self.app_client.get('/actions/activate', follow_redirects=True)
         command_executor.activate.assert_called_with()
-        status_monitor.set_status.assert_called_with(Status.ACTIVATED, scheduled_deactivation=ANY)
+        self.assertIn({"status": Status.ACTIVATED, "scheduled_deactivation": ANY}, self.status_change_messages)
         automatic_deactivator.reset_timer.assert_called_with(None)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         response_json = json.loads(response.get_data(as_text=True))
@@ -74,9 +87,8 @@ class TestPelicanServer(unittest.TestCase):
         )
         response = self.app_client.get('/actions/activate?timeout_seconds=1', follow_redirects=True)
         command_executor.activate.assert_called_with()
-        status_monitor.set_status.assert_has_calls(
-            calls=[call(Status.MODIFYING),
-                   call(Status.ACTIVATED, scheduled_deactivation=ANY)])
+        self.assertIn({"status": Status.MODIFYING}, self.status_change_messages)
+        self.assertIn({"status": Status.ACTIVATED, "scheduled_deactivation": ANY}, self.status_change_messages)
         automatic_deactivator.reset_timer.assert_called_with(1)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         response_json = json.loads(response.get_data(as_text=True))
@@ -94,9 +106,8 @@ class TestPelicanServer(unittest.TestCase):
         )
         response = self.app_client.get('/actions/deactivate', follow_redirects=True)
         command_executor.deactivate.assert_called_with()
-        status_monitor.set_status.assert_has_calls(
-            calls=[call(Status.MODIFYING),
-                   call(Status.DEACTIVATED, scheduled_deactivation=ANY)])
+        self.assertIn({"status": Status.MODIFYING}, self.status_change_messages)
+        self.assertIn({"status": Status.DEACTIVATED}, self.status_change_messages)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         response_json = json.loads(response.get_data(as_text=True))
         self.assertEqual({"result": "deactivated"}, response_json, "Response states that the system is now deactivated")
@@ -159,9 +170,8 @@ class TestPelicanServer(unittest.TestCase):
         )
         response = self.app_client.get('/actions/rescan', follow_redirects=True)
         command_executor.rescan.assert_called_with()
-        status_monitor.set_status.assert_has_calls(
-            calls=[call(Status.MODIFYING),
-                   call(Status.ACTIVATED, scheduled_deactivation=ANY)])
+        self.assertIn({"status": Status.MODIFYING}, self.status_change_messages)
+        self.assertIn({"status": Status.ACTIVATED, "scheduled_deactivation": ANY}, self.status_change_messages)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         response_json = json.loads(response.get_data(as_text=True))
         self.assertEqual({"result": "activated"}, response_json, "Response states that the system is now activated")

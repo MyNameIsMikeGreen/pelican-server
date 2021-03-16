@@ -2,7 +2,8 @@ import datetime
 import logging
 from threading import Timer
 
-from statusMonitor import Status
+from statusmonitor import Status, StatusMonitor
+from pubsub import pub
 
 
 class AutomaticDeactivator:
@@ -35,4 +36,4 @@ class AutomaticDeactivator:
         if self.status_monitor.status == Status.DEACTIVATED:
             return
         self.command_executor.deactivate()
-        self.status_monitor.set_status(Status.DEACTIVATED, changed_by="automatic_deactivator")
+        pub.sendMessage(StatusMonitor.TOPIC, status=Status.DEACTIVATED, changed_by="automatic_deactivator")

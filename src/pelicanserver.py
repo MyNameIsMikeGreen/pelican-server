@@ -3,10 +3,11 @@ from subprocess import CalledProcessError
 
 from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
+from pubsub import pub
 
 from automaticdeactivator import AutomaticDeactivator
 from commands import CommandExecutor
-from statusMonitor import StatusMonitor, Status
+from statusmonitor import StatusMonitor, Status
 
 __author__ = "Mike Green"
 
@@ -59,11 +60,11 @@ class PelicanServer:
                 return jsonify({"result": "already activated; no change"})
             elif self.status_monitor.status == Status.MODIFYING:
                 return jsonify({"result": "system already modifying; no change"})
-            self.status_monitor.set_status(Status.MODIFYING)
+            pub.sendMessage(StatusMonitor.TOPIC, status=Status.MODIFYING)
             self.command_executor.activate()
             scheduled_deactivation = self.automatic_deactivator.reset_timer(timeout_seconds)
             formatted_scheduled_deactivation = scheduled_deactivation.strftime("%Y-%m-%d %H:%M:%S")
-            self.status_monitor.set_status(Status.ACTIVATED, scheduled_deactivation=formatted_scheduled_deactivation)
+            pub.sendMessage(StatusMonitor.TOPIC, status=Status.ACTIVATED, scheduled_deactivation=formatted_scheduled_deactivation)
             return jsonify({"result": "activated"})
 
         @app.route("/actions/deactivate")
@@ -72,9 +73,9 @@ class PelicanServer:
                 return jsonify({"result": "already deactivated; no change"})
             elif self.status_monitor.status == Status.MODIFYING:
                 return jsonify({"result": "system already modifying; no change"})
-            self.status_monitor.set_status(Status.MODIFYING)
+            pub.sendMessage(StatusMonitor.TOPIC, status=Status.MODIFYING)
             self.command_executor.deactivate()
-            self.status_monitor.set_status(Status.DEACTIVATED, scheduled_deactivation=None)
+            pub.sendMessage(StatusMonitor.TOPIC, status=Status.DEACTIVATED)
             return jsonify({"result": "deactivated"})
 
         @app.route("/actions/rescan")
@@ -84,11 +85,11 @@ class PelicanServer:
                 return jsonify({"result": "rescan must only occur when activated; no change"})
             elif self.status_monitor.status == Status.MODIFYING:
                 return jsonify({"result": "system already modifying; no change"})
-            self.status_monitor.set_status(Status.MODIFYING)
+            pub.sendMessage(StatusMonitor.TOPIC, status=Status.MODIFYING)
             self.command_executor.rescan()
             scheduled_deactivation = self.automatic_deactivator.reset_timer(timeout_seconds)
             formatted_scheduled_deactivation = scheduled_deactivation.strftime("%Y-%m-%d %H:%M:%S")
-            self.status_monitor.set_status(Status.ACTIVATED, scheduled_deactivation=formatted_scheduled_deactivation)
+            pub.sendMessage(StatusMonitor.TOPIC, status=Status.ACTIVATED, scheduled_deactivation=formatted_scheduled_deactivation) # TODO: Change to SCANNING
             return jsonify({"result": "activated"})
 
         return app
