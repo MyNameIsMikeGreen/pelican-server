@@ -4,18 +4,18 @@ import unittest
 
 from testfixtures import LogCapture
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src/')))
 
 from commands import CommandExecutor
 
-DUMMY_MOUNT_POINT = os.path.dirname(__file__) + "/testresources/dummyMountPoint"
+DUMMY_MOUNT_POINT = os.path.dirname(__file__) + "/../testresources/dummyMountPoint"
 
 
 class TestCommandExecutor(unittest.TestCase):
 
     def setUp(self):
         device_config_file_path = self._populate_device_config_file(
-            os.path.dirname(__file__) + "/testresources/devicesTemplate.json",
+            os.path.dirname(__file__) + "/../testresources/devicesTemplate.json",
             DUMMY_MOUNT_POINT
         )
         self.command_executor = CommandExecutor(device_config_file_path)

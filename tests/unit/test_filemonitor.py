@@ -10,9 +10,9 @@ from pubsub import pub
 from filemonitor import MinidlnaLogMonitor
 from statusmonitor import StatusMonitor, Status
 
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/')))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../src/')))
 
-TEST_FILE = os.path.dirname(__file__) + "/testresources/testfile"
+TEST_FILE = os.path.dirname(__file__) + "/../testresources/testfile"
 
 
 @ddt
@@ -33,7 +33,7 @@ class TestStatusMonitor(unittest.TestCase):
         self.minidlna_log_monitor.start()
 
         # When: the monitored file is modified
-        with open(os.path.dirname(__file__) + "/testresources/" + log_file) as new_log_file:
+        with open(os.path.dirname(__file__) + "/../testresources/" + log_file) as new_log_file:
             new_log_file_contents = new_log_file.read()
         with open(TEST_FILE, "w") as testfile:
             testfile.write(new_log_file_contents)
@@ -62,7 +62,7 @@ class TestStatusMonitor(unittest.TestCase):
         self.minidlna_log_monitor.start()
 
         # When: the monitored file is modified
-        with open(os.path.dirname(__file__) + "/testresources/minidlnaLogFile_miscellaneous.log") as new_log_file:
+        with open(os.path.dirname(__file__) + "/../testresources/minidlnaLogFile_miscellaneous.log") as new_log_file:
             new_log_file_contents = new_log_file.read()
         with open(TEST_FILE, "w") as testfile:
             testfile.write(new_log_file_contents)
