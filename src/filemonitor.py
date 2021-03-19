@@ -38,13 +38,13 @@ class MinidlnaLogFileEventHandler(FileSystemEventHandler):
 
     @staticmethod
     def _minidlna_is_scanning(log_path):
-        # [2021/03/15 18:57:03] scanner.c:730: warn: Scanning /media/pi/WD_5TB_Media/TORRENTS
-        # [2021/03/15 19:02:09] scanner.c:819: warn: Scanning /media/pi/WD_5TB_Media/TORRENTS finished (3256 files)!
+        # [2021/03/15 18:57:03] scanner.c:730: warn: Scanning /mypath
+        # [2021/03/15 19:02:09] scanner.c:819: warn: Scanning /mypath finished (2 files)!
         # TODO: Better solution
 
         with open(log_path) as log_file:
             log_lines = deque(log_file, maxlen=3)
         for log_line in log_lines:
-            if "warn: Scanning" in log_line and "finished!" not in log_line:
+            if "warn: Scanning" in log_line and "finished" not in log_line:
                 return True
         return False
