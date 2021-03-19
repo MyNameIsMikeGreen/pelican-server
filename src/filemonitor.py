@@ -31,20 +31,26 @@ class MinidlnaLogFileEventHandler(FileSystemEventHandler):
 
     def on_modified(self, event: FileSystemEvent):
         super().on_modified(event)
-        if self._minidlna_is_scanning(event.src_path):
+        is_scanning = self._minidlna_is_scanning(event.src_path)
+        if is_scanning is None:
+            return
+        if is_scanning:
             pub.sendMessage(StatusMonitor.TOPIC, status=Status.SCANNING)
-        else:
+        elif not is_scanning:
             pub.sendMessage(StatusMonitor.TOPIC, status=Status.NOT_SCANNING)
 
     @staticmethod
     def _minidlna_is_scanning(log_path):
-        # [2021/03/15 18:57:03] scanner.c:730: warn: Scanning /mypath
-        # [2021/03/15 19:02:09] scanner.c:819: warn: Scanning /mypath finished (2 files)!
-        # TODO: Better solution
-
+        """
+        Given a miniDLNA log file. Determines whether miniDLNA is currently scanning.
+        If the answer cannot be determined, None is returned.
+        :param log_path: Path to log file.
+        :return: True if scanning. False if not scanning. None if state is unknown.
+        """
         with open(log_path) as log_file:
-            log_lines = deque(log_file, maxlen=3)
-        for log_line in log_lines:
-            if "warn: Scanning" in log_line and "finished" not in log_line:
-                return True
-        return False
+            for log_line in reversed(log_file.readlines()):
+                if "warn: Scanning" in log_line and "finished" in log_line:
+                    return False
+                if "warn: Scanning" in log_line and "finished" not in log_line:
+                    return True
+        return None
