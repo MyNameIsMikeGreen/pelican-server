@@ -137,3 +137,4 @@ dmypy.json
 # Project
 config/
 node_modules
+/tests/testresources/devices.json

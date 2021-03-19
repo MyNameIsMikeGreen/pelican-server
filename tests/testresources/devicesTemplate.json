@@ -4,7 +4,7 @@
     "partitions": [
       {
         "path": "/dev/sda1",
-        "mountPoint": "tests/testresources/dummyMountPoint"
+        "mountPoint": "${MOUNT_POINT}"
       }
     ]
   }
