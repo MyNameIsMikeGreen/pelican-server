@@ -1,5 +1,3 @@
-from collections import deque
-
 from pubsub import pub
 from watchdog.events import FileSystemEventHandler, FileSystemEvent
 from watchdog.observers import Observer

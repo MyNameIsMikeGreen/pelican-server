@@ -12,7 +12,7 @@ from statusmonitor import StatusMonitor, Status
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../src/')))
 
-TEST_FILE = "testfile"
+TEST_FILE = os.path.dirname(__file__) + "/testresources/testfile"
 
 
 @ddt
