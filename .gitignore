@@ -138,3 +138,6 @@ dmypy.json
 config/
 node_modules
 /tests/testresources/devices.json
+
+# Ignore exclusions
+!/tests/testresources/*.log
