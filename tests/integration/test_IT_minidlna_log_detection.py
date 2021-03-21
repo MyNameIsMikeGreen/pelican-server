@@ -13,7 +13,7 @@ from statusmonitor import StatusMonitor, Status
 TEST_FILE = os.path.dirname(__file__) + "/../testresources/testfile"
 
 
-class TestITScanning(unittest.TestCase):
+class TestITDlnaLogDetection(unittest.TestCase):
 
     def test_status_changed_to_scanning_when_log_file_indicates_minidlna_is_scanning(self):
         # Given: the file monitor is started
