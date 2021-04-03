@@ -13,7 +13,7 @@ class MinidlnaLogMonitor:
     def __init__(self, log_path="/var/log/minidlna.log"):
         self.path = log_path
         self.observer = Observer()
-        self.event_handler = MinidlnaLogFileEventHandler()
+        self.event_handler = MinidlnaLogFileEventHandler(self.path)
         self.observer.schedule(self.event_handler, self.path)
 
     def start(self):
@@ -28,13 +28,14 @@ class MinidlnaLogFileEventHandler(FileSystemEventHandler):
 
     logger = logging.getLogger()
 
-    def __init__(self):
+    def __init__(self, log_path):
         super().__init__()
+        self.path = log_path
 
     def on_modified(self, event: FileSystemEvent):
         super().on_modified(event)
         self.logger.info("Log file modified")
-        minidlna_is_scanning = self._minidlna_is_scanning(event.src_path)
+        minidlna_is_scanning = self._minidlna_is_scanning(self.path)
         if minidlna_is_scanning is None:
             self.logger.info("Unable to determine scan state")
             return
