@@ -29,8 +29,13 @@ class MinidlnaLogFileEventHandler(FileSystemEventHandler):
 
     def on_modified(self, event: FileSystemEvent):
         super().on_modified(event)
-        if self._minidlna_is_scanning(event.src_path):
+        minidlna_is_scanning = self._minidlna_is_scanning(event.src_path)
+        if minidlna_is_scanning is None:
+            return
+        if minidlna_is_scanning:
             pub.sendMessage(StatusMonitor.TOPIC, status=Status.SCANNING)
+        else:
+            pub.sendMessage(StatusMonitor.TOPIC, status=Status.SCAN_COMPLETE, changed_by="scan_completion")
 
     @staticmethod
     def _minidlna_is_scanning(log_path):

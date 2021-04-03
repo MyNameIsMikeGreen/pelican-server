@@ -40,12 +40,13 @@ class TestStatusMonitor(unittest.TestCase):
             .until(lambda: len(self.topic_messages) > 0)
         self.assertEqual(1, len(self.topic_messages), "One message was placed on the topic")
         self.assertEqual(Status.SCANNING, self.topic_messages[0][0], "Message contains correct status")
+        self.assertEqual("http_request", self.topic_messages[0][1], "Message contains correct changed_by value")
 
         # Teardown
         self.minidlna_log_monitor.stop()
         pub.unsubAll()
 
-    def test_monitor_does_not_fire_event_if_minidlna_has_finished_scanning(self):
+    def test_monitor_fires_event_if_minidlna_has_finished_scanning(self):
         # Given: we monitor the output topic for changes
         self.topic_messages = []
         pub.subscribe(self._read_topic, StatusMonitor.TOPIC)
@@ -61,9 +62,15 @@ class TestStatusMonitor(unittest.TestCase):
             testfile.write(new_log_file_contents)
             testfile.flush()
 
-        # Then: no message appears on the topic
-        sleep(5)  # Allow time for message to appear
-        self.assertListEqual([], self.topic_messages, "No messages were places on the topic")
+        # Then: the monitor publishes a message to the topic
+        wait() \
+            .with_description("Waiting for message to appear on topic") \
+            .poll_interval(1, SECOND) \
+            .at_most(5, SECOND) \
+            .until(lambda: len(self.topic_messages) > 0)
+        self.assertEqual(1, len(self.topic_messages), "One message was placed on the topic")
+        self.assertEqual(Status.SCAN_COMPLETE, self.topic_messages[0][0], "Message contains correct status")
+        self.assertEqual("scan_completion", self.topic_messages[0][1], "Message contains correct changed_by value")
 
         # Teardown
         self.minidlna_log_monitor.stop()
