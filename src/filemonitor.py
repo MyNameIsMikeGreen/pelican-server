@@ -1,3 +1,5 @@
+import logging
+
 from pubsub import pub
 from watchdog.events import FileSystemEventHandler, FileSystemEvent
 from watchdog.observers import Observer
@@ -24,17 +26,23 @@ class MinidlnaLogMonitor:
 
 class MinidlnaLogFileEventHandler(FileSystemEventHandler):
 
+    logger = logging.getLogger()
+
     def __init__(self):
         super().__init__()
 
     def on_modified(self, event: FileSystemEvent):
         super().on_modified(event)
+        self.logger.info("Log file modified")
         minidlna_is_scanning = self._minidlna_is_scanning(event.src_path)
         if minidlna_is_scanning is None:
+            self.logger.info("Unable to determine scan state")
             return
         if minidlna_is_scanning:
+            self.logger.info("Minidlna is scanning")
             pub.sendMessage(StatusMonitor.TOPIC, status=Status.SCANNING)
         else:
+            self.logger.info("Minidlna is not scanning")
             pub.sendMessage(StatusMonitor.TOPIC, status=Status.SCAN_COMPLETE, changed_by="scan_completion")
 
     @staticmethod
