@@ -95,7 +95,8 @@ def main():
     logging.basicConfig(filename='pelicanServerLog.log', level=logging.INFO)
     status_monitor = StatusMonitor()
     command_executor = CommandExecutor()
-    _ = MinidlnaLogMonitor()
+    log_monitor = MinidlnaLogMonitor()
+    log_monitor.start()
     pelican_server = PelicanServer(status_monitor, command_executor)
     pelican_server.app.run(host="0.0.0.0", port=8000)
 
