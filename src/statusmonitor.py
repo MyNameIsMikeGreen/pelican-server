@@ -5,7 +5,6 @@ from pubsub import pub
 
 
 class Status(enum.Enum):
-    NOT_SCANNING = 4
     SCANNING = 3
     MODIFYING = 2
     ACTIVATED = 1
@@ -23,8 +22,6 @@ class StatusMonitor:
         pub.sendMessage(self.TOPIC, status=Status.DEACTIVATED, changed_by="startup")
 
     def _set_status(self, status: Status, changed_by="http_request", scheduled_deactivation=None):
-        if status == Status.NOT_SCANNING and self.status != Status.SCANNING:
-            return  # Ignore NOT_SCANNING unless currently scanning
         self.status = status
         self.last_change = datetime.now()
         self.last_change_by = changed_by

@@ -7,6 +7,7 @@ from pubsub import pub
 
 from automaticdeactivator import AutomaticDeactivator
 from commands import CommandExecutor
+from filemonitor import MinidlnaLogFileEventHandler
 from statusmonitor import StatusMonitor, Status
 
 __author__ = "Mike Green"
@@ -80,17 +81,12 @@ class PelicanServer:
 
         @app.route("/actions/rescan")
         def rescan():
-            timeout_seconds = request.args.get('timeout_seconds', default=None, type=int)
             if self.status_monitor.status == Status.DEACTIVATED:
                 return jsonify({"result": "rescan must only occur when activated; no change"})
             elif self.status_monitor.status == Status.MODIFYING:
                 return jsonify({"result": "system already modifying; no change"})
-            pub.sendMessage(StatusMonitor.TOPIC, status=Status.MODIFYING)
             self.command_executor.rescan()
-            scheduled_deactivation = self.automatic_deactivator.reset_timer(timeout_seconds)
-            formatted_scheduled_deactivation = scheduled_deactivation.strftime("%Y-%m-%d %H:%M:%S")
-            pub.sendMessage(StatusMonitor.TOPIC, status=Status.ACTIVATED, scheduled_deactivation=formatted_scheduled_deactivation) # TODO: Change to SCANNING
-            return jsonify({"result": "activated"})
+            return jsonify({"result": "scanning"})
 
         return app
 
@@ -99,6 +95,7 @@ def main():
     logging.basicConfig(filename='pelicanServerLog.log', level=logging.INFO)
     status_monitor = StatusMonitor()
     command_executor = CommandExecutor()
+    _ = MinidlnaLogFileEventHandler()
     pelican_server = PelicanServer(status_monitor, command_executor)
     pelican_server.app.run(host="0.0.0.0", port=8000)
 

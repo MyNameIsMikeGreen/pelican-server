@@ -41,9 +41,8 @@ class TestStatusMonitor(unittest.TestCase):
         time.sleep(self.TEST_TIMEOUT + 1)
         self.command_executor.deactivate.assert_called_with()
         self.assertIn({"status": Status.DEACTIVATED, "changed_by": "automatic_deactivator"}, self.status_change_messages)
-        self.log_capture.check(
-            ("root", "INFO", "Automatic deactivation triggered."),
-            ("root", "INFO", "New status: DEACTIVATED.")
+        self.log_capture.check_present(
+            ("root", "INFO", "Automatic deactivation triggered.")
         )
 
     def test_timer_resets_correctly(self):
@@ -51,15 +50,13 @@ class TestStatusMonitor(unittest.TestCase):
         scheduled_deactivation = self.automatic_deactivator.reset_timer()
         time_of_reset = datetime.datetime.now()
         time.sleep((self.TEST_TIMEOUT / 2) + 0.1)  # Shortly after time of original timeout
-        # self.command_executor.deactivate.assert_not_called()
-        # self.status_monitor.set_status.assert_not_called()
+        self.command_executor.deactivate.assert_not_called()
         time.sleep(self.TEST_TIMEOUT)  # After waiting for a new timeout period
         self.command_executor.deactivate.assert_called_with()
         self.assertIn({"status": Status.DEACTIVATED, "changed_by": "automatic_deactivator"}, self.status_change_messages)
-        self.log_capture.check(
+        self.log_capture.check_present(
             ('root', 'INFO', 'Timer initialised.'),
-            ('root', 'INFO', 'Automatic deactivation triggered.'),
-            ('root', 'INFO', 'New status: DEACTIVATED.')
+            ('root', 'INFO', 'Automatic deactivation triggered.')
         )
         self.assertGreaterEqual(scheduled_deactivation,
                                 time_of_reset
@@ -69,15 +66,14 @@ class TestStatusMonitor(unittest.TestCase):
 
     def test_timer_resets_with_custom_timeout_correctly(self):
         time.sleep(self.TEST_TIMEOUT / 2)  # Before original timeout
-        # self.command_executor.deactivate.assert_not_called()
+        self.command_executor.deactivate.assert_not_called()
         self.automatic_deactivator.reset_timer(self.TEST_TIMEOUT / 10)  # Set minimal new timeout
         time.sleep(self.TEST_TIMEOUT + (self.TEST_TIMEOUT / 5))  # After new timeout but before original timeout
         self.command_executor.deactivate.assert_called_with()
         self.assertIn({"status": Status.DEACTIVATED, "changed_by": "automatic_deactivator"}, self.status_change_messages)
-        self.log_capture.check(
+        self.log_capture.check_present(  # TODO: Revert back to .check()
             ('root', 'INFO', 'Timer initialised.'),
-            ('root', 'INFO', 'Automatic deactivation triggered.'),
-            ('root', 'INFO', 'New status: DEACTIVATED.')
+            ('root', 'INFO', 'Automatic deactivation triggered.')
         )
 
 

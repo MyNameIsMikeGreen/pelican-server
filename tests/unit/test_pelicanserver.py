@@ -158,7 +158,7 @@ class TestPelicanServer(unittest.TestCase):
                                  'MiniDLNA may not be installed. Aborting...')
         )
 
-    def test_server_returns_activation_response_when_rescan_occurs(self):
+    def test_server_returns_scanning_response_when_rescan_occurs(self):
         status_monitor = Mock()
         status_monitor.status = Status.ACTIVATED
         automatic_deactivator = Mock()
@@ -170,11 +170,9 @@ class TestPelicanServer(unittest.TestCase):
         )
         response = self.app_client.get('/actions/rescan', follow_redirects=True)
         command_executor.rescan.assert_called_with()
-        self.assertIn({"status": Status.MODIFYING}, self.status_change_messages)
-        self.assertIn({"status": Status.ACTIVATED, "scheduled_deactivation": ANY}, self.status_change_messages)
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         response_json = json.loads(response.get_data(as_text=True))
-        self.assertEqual({"result": "activated"}, response_json, "Response states that the system is now activated")
+        self.assertEqual({"result": "scanning"}, response_json, "Response states that the system is now scanning")
 
     def test_server_returns_modifying_response_when_rescan_called_and_already_modifying(self):
         status_monitor = Mock()
