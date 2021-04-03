@@ -7,7 +7,7 @@ from pubsub import pub
 
 from automaticdeactivator import AutomaticDeactivator
 from commands import CommandExecutor
-from filemonitor import MinidlnaLogFileEventHandler
+from filemonitor import MinidlnaLogMonitor
 from statusmonitor import StatusMonitor, Status
 
 __author__ = "Mike Green"
@@ -95,7 +95,7 @@ def main():
     logging.basicConfig(filename='pelicanServerLog.log', level=logging.INFO)
     status_monitor = StatusMonitor()
     command_executor = CommandExecutor()
-    _ = MinidlnaLogFileEventHandler()
+    _ = MinidlnaLogMonitor()
     pelican_server = PelicanServer(status_monitor, command_executor)
     pelican_server.app.run(host="0.0.0.0", port=8000)
 
