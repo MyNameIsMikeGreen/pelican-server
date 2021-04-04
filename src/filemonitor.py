@@ -47,10 +47,9 @@ class MinidlnaLogFileEventHandler(FileSystemEventHandler):
         :return: True if scanning. False if not scanning. None if state is unknown.
         """
         with open(log_path) as log_file:
-            for log_line in reversed(log_file.readlines()):
-                if "warn: Scanning" in log_line:
-                    if "finished" in log_line:
-                        return False
-                    else:
-                        return True
-        return None
+            last_line = log_file.readlines()[-1]
+        if "warn: Scanning" in last_line:
+            if "finished" in last_line:
+                return False
+            else:
+                return True
