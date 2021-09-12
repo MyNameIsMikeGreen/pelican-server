@@ -3,6 +3,7 @@ from subprocess import CalledProcessError
 
 from flask import Flask, jsonify, send_from_directory, request
 from flask_cors import CORS
+from prometheus_flask_exporter import PrometheusMetrics
 from pubsub import pub
 
 from automaticdeactivator import AutomaticDeactivator
@@ -31,6 +32,7 @@ class PelicanServer:
         else:
             self.automatic_deactivator = AutomaticDeactivator(self.command_executor, self.status_monitor)
         self.app = self._create_app()
+        self.prometheus_metrics = PrometheusMetrics(self.app)
 
     def _create_app(self):
         app = Flask(__name__, static_folder='../build', static_url_path='/')
