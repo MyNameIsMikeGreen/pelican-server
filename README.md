@@ -1,4 +1,5 @@
-# Pelican Server
+Pelican Server
+==============
 Lightweight web server application and web frontend for Pelican.
 
 # Usage
@@ -65,3 +66,13 @@ npm run build
 ```
 
 The production build will place static build files into `build/`.
+
+## Monitor
+Pelican Server serves Prometheus metrics at `/metrics`. As well as typical metrics provided by [Prometheus Flask Exporter](https://github.com/rycus86/prometheus_flask_exporter), custom metrics detailing the current activation state of Pelican can be found via the following gauges:
+
+* `pelican_status_is_activated`
+* `pelican_status_is_deactivated`
+* `pelican_status_is_modifying`
+* `pelican_status_is_scanning`
+
+At any one time, one of these metrics will have a value of `1` (meaning true), whereas the others will have values of `0` (false).
