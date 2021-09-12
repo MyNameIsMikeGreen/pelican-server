@@ -58,8 +58,9 @@ class TestStatusMonitor(unittest.TestCase):
         self.prometheus_service.gauge(metric_name, metric_value)
 
         # Then: the metric is created
-        self.assertEqual(self.prometheus_service.metrics[0].describe()[0].name, f"{self.metric_prefix + metric_name}")
-        self.assertEqual(self.prometheus_service.metrics[0].describe()[0].type, "gauge")
+        next(metric for metric in self.prometheus_service.metrics
+             if metric.describe()[0].name == f"{self.metric_prefix + metric_name}"
+             and metric.describe()[0].type == "gauge")
 
         # And: the action is logged
         self.log_capture.check(
