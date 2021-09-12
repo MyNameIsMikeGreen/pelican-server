@@ -6,3 +6,5 @@ watchdog~=2.0.2
 pypubsub~=4.0.3
 busypie~=0.4.5
 ddt~=1.4.2
+prometheus_client~=0.11.0
+prometheus_flask_exporter~=0.18.2

@@ -5,6 +5,7 @@ import unittest
 from subprocess import CalledProcessError
 from unittest.mock import Mock, ANY
 
+from prometheus_flask_exporter import PrometheusMetrics
 from pubsub import pub
 from testfixtures import LogCapture
 
@@ -191,6 +192,11 @@ class TestPelicanServer(unittest.TestCase):
         self.assertEqual(200, response.status_code, "HTTP 200 returned")
         response_json = json.loads(response.get_data(as_text=True))
         self.assertEqual({"result": "rescan must only occur when activated; no change"}, response_json, "Response states no change")
+
+    def test_registers_a_prometheus_metrics_on_launch(self):
+        self.setup_server()
+        self.assertIsInstance(self.pelican_server.prometheus_metrics, PrometheusMetrics)
+        self.assertIs(self.pelican_server.prometheus_metrics.app, self.pelican_server.app)
 
 
 if __name__ == "__main__":
