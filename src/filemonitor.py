@@ -8,7 +8,7 @@ from statusmonitor import StatusMonitor, Status
 class MinidlnaLogMonitor:
     __slots__ = ["path", "observer", "event_handler"]
 
-    def __init__(self, log_path="/var/log/minidlna/minidlna.log"):
+    def __init__(self, log_path="/var/log/minidlna.log"):
         self.path = log_path
         self.observer = Observer()
         self.event_handler = MinidlnaLogFileEventHandler(self.path)
