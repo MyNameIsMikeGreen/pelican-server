@@ -13,7 +13,7 @@ chmod -R 757 ${LOG_FILE}
 VENV_DIR=venv
 if [[ ! -d "$VENV_DIR" ]]; then
     echo "$VENV_DIR directory not detected. Creating virtual environment..."
-    virtualenv ${VENV_DIR}
+    /usr/local/bin/virtualenv ${VENV_DIR}
 fi
 source ${VENV_DIR}/bin/activate
 pip3 install -r requirements.txt
